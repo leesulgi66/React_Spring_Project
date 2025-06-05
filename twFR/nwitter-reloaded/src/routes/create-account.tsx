@@ -1,0 +1,129 @@
+import { useState } from "react";
+import styled from "styled-components"
+import { Link, useNavigate } from "react-router-dom";
+import GithubButton from "../components/github-btn";
+import axios, { AxiosError } from "axios";
+
+const Wrapper = styled.div`
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 420px;
+    padding: 50px 0px;
+`;
+
+const Title = styled.h1`
+    font-size: 42px;
+`;
+
+const Form = styled.form`
+    margin-top: 50px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+`;
+
+const Input = styled.input`
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: none;
+    width: 100%;
+    font-size: 16px;
+    &[type="submit"]{
+        cursor: pointer;
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+    &.log-in{
+        background-color: dodgerblue;
+    }
+`;
+
+const Error = styled.span`
+    color: red;
+`;
+
+const Switcher = styled.span`
+    margin-top: 20px;
+    a{
+        color: #1d9bf0;
+    }
+`;
+
+export default function CreateAccount() {
+    const navigate = useNavigate();
+    const [isLoading, setLoading] = useState(false);
+    const [username, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [passwordCheck, setPasswordCheck] = useState("");
+    const [error, setError] = useState("");
+    const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+        const {target: { name, value }} = e;
+        if (name === "username") {
+            setName(value);
+        }else if (name === "email") {
+            setEmail(value);
+        }else if (name === "password") {
+            setPassword(value);
+        }else if (name === "passwordCheck"){
+            setPasswordCheck(value);
+        }
+    }
+    const onSubmit =async (e : React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setError("");
+        if(isLoading || username === "" || email === "" || password === "") return;
+        if(password !== passwordCheck) {
+            setError("password check");
+            return
+        }
+        console.log(email);
+        try{
+            const response = await axios.post("http://localhost:8080/api/user/signIn", 
+                {
+                    username,
+                    password,
+                    email               
+                },
+                {withCredentials : true});
+            
+            console.log(response);
+
+            if(response.status == 200) {
+                alert("회원가입 완료");
+                setLoading(false);
+                navigate("/");
+            }
+            
+        }catch(e) {
+            if(e instanceof AxiosError){
+                console.log(e.response);
+                setError(e.response?.data);
+            }
+        }finally {
+            setLoading(false);
+        }
+    }
+    return (
+        <Wrapper>
+            <Title>Join X</Title>
+            <Form onSubmit={onSubmit}>
+                <Input onChange={onChange} name="username" value={username} placeholder="Name" type="text" required/>
+                <Input onChange={onChange} name="email" value={email} placeholder="Email" type="email" required/>
+                <Input onChange={onChange} name="password" value={password} placeholder="Password" type="password" required/>
+                <Input onChange={onChange} name="passwordCheck" value={passwordCheck} placeholder="Password check" type="password" required/>
+                <Input type="submit" value={isLoading ? "Loading..." : "Create Account"}/>
+            </Form>
+            {error !== "" ? <Error>{error}</Error> : null}
+            <Switcher>
+                Already have an account? <Link to="/login">Log in &rarr;</Link>
+            </Switcher>
+            <GithubButton />
+        </Wrapper>
+    )
+}

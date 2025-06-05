@@ -1,0 +1,70 @@
+package com.example.nweeter_backend.controller;
+
+import com.example.nweeter_backend.auth.PrincipalDetails;
+import com.example.nweeter_backend.dto.MemberInfoResponseDto;
+import com.example.nweeter_backend.dto.MemberSignInRequestDto;
+import com.example.nweeter_backend.service.MemberService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+@Slf4j
+@RestController
+@RequestMapping("/api")
+public class MemberApiController {
+
+    private final MemberService memberService;
+
+    @Autowired
+    public MemberApiController(MemberService memberService) {
+        this.memberService = memberService;
+    }
+
+    @GetMapping("/user/check")
+    public ResponseEntity<Long> loginCheck(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        log.info("log in check call ");
+        return new ResponseEntity<>(principalDetails.getMember().getId() , HttpStatus.OK);
+    }
+
+    @PostMapping("/user/signIn")
+    public ResponseEntity<String> signIn(@RequestBody MemberSignInRequestDto member) throws IOException {
+        log.info("sign in call");
+        memberService.save(member);
+        return new ResponseEntity<>("save ok", HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<MemberInfoResponseDto> userInfo(@AuthenticationPrincipal PrincipalDetails principal){
+        log.info("user info call");
+        Long userId = principal.getMember().getId();
+        MemberInfoResponseDto memberInfo = memberService.getInfo(userId);
+        System.out.println(memberInfo);
+        return new ResponseEntity<>(memberInfo, HttpStatus.OK);
+    }
+
+    @PatchMapping("/user")
+    public ResponseEntity<String> userInfoEdit(@RequestParam(value = "file", required = false) MultipartFile file,
+                             @RequestParam(value = "username", required = false) String username,
+                             @AuthenticationPrincipal PrincipalDetails principal) throws IOException {
+        log.info("user patch call");
+        if(file != null) {
+            memberService.patchMember(file, principal);
+        }
+        if(username != null) {
+            memberService.patchMember(username, principal);
+        }
+        return new ResponseEntity<>("member patch ok", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/user")
+    public ResponseEntity<String> userDelete(@AuthenticationPrincipal PrincipalDetails principal) {
+        memberService.deleteMember(principal);
+        return new ResponseEntity<>("sign out ok", HttpStatus.OK);
+    }
+}
