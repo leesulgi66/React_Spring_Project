@@ -1,4 +1,3 @@
-import { GithubAuthProvider, signInWithPopup } from "firebase/auth";
 import styled from "styled-components"
 import { useNavigate } from "react-router-dom";
 
