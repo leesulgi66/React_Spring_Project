@@ -9,6 +9,6 @@ public class WebConfigure implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/image/**")
-                .addResourceLocations("file:C:\\Users\\leesu\\Desktop\\twier clone\\twBE\\nweeter-backend\\src\\main\\resources\\static\\image\\");
+                .addResourceLocations("file:C:\\Users\\leesu\\Desktop\\react_spring\\react-spring\\React_Spring_Project\\twBE\\nweeter-backend\\src\\main\\resources\\static\\image\\");
     }
 }

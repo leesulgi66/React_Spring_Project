@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -64,7 +65,14 @@ public class MemberApiController {
 
     @DeleteMapping("/user")
     public ResponseEntity<String> userDelete(@AuthenticationPrincipal PrincipalDetails principal) {
+        log.info("user delete call");
         memberService.deleteMember(principal);
         return new ResponseEntity<>("sign out ok", HttpStatus.OK);
+    }
+
+    @GetMapping("/csrf-token")
+    public CsrfToken csrf(CsrfToken token) {
+        log.info("csrf-token call");
+        return token;
     }
 }

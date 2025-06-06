@@ -17,7 +17,7 @@ public class ImageHandler {
     public List<String> save(MultipartFile image, String key) throws IOException {
         String fileExtension = Objects.requireNonNull(image.getOriginalFilename()).split("\\.")[1];
         String uri = "http://localhost:8080/image/" + key+ "."+fileExtension;
-        String fullPathName = "C:\\Users\\leesu\\Desktop\\twier clone\\twBE\\nweeter-backend\\src\\main\\resources\\static\\image\\" + key +"."+fileExtension;
+        String fullPathName = "C:\\Users\\leesu\\Desktop\\react_spring\\react-spring\\React_Spring_Project\\twBE\\nweeter-backend\\src\\main\\resources\\static\\image\\" + key +"."+fileExtension;
         image.transferTo(new File(fullPathName));
         List<String> list = new ArrayList<>();
         list.add(0, fullPathName);
