@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom";
 import GithubButton from "../components/github-btn";
@@ -60,6 +60,7 @@ export default function CreateAccount() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [csrfToken ,setCsrfToken] = useState("");
     const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
         const {target: { name, value }} = e;
         if (name === "email") {
@@ -84,6 +85,9 @@ export default function CreateAccount() {
                 method: 'POST',
                 data: formData,
                 withCredentials: true,
+                headers:{
+                    'X-CSRF-TOKEN': csrfToken
+                }
             });
 
             //console.log("로그인 data : ",response.data); // username
@@ -106,6 +110,16 @@ export default function CreateAccount() {
             setLoading(false);
         }
     }
+
+    useEffect( ()=>{
+        axios.get("http://localhost:8080/api/csrf-token", { withCredentials: true })
+        .then(response => {
+            setCsrfToken(response.data.token);
+            axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
+        }).catch(e => {
+            console.log(e);
+        })
+    },[]);
     return (
         <Wrapper>
             <Title>Log into X</Title>
