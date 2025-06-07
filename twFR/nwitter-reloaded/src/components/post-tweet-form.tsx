@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components"
 
@@ -63,6 +64,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     const [tweet, setTweet] = useState("");
     const [file, setFile] = useState<File|null>(null);
     const [user, setUser] = useState(window.sessionStorage.getItem("user"));
+    const csrfToken = useSelector((state:any)=>state.csrfToken);
     const navigate = useNavigate();
 
     const onChange = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -93,7 +95,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             }
             const response = await axios.post("http://localhost:8080/api/board",formData, {
                 headers: {
-                    "Content-Type" : "multipart/form-data",
+                    'X-CSRF-TOKEN': csrfToken,
                 },
                 withCredentials : true,
             });

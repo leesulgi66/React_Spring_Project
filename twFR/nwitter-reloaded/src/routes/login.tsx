@@ -3,6 +3,7 @@ import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom";
 import GithubButton from "../components/github-btn";
 import axios, { AxiosError } from "axios";
+import { useDispatch, useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     height: 100%;
@@ -60,7 +61,9 @@ export default function CreateAccount() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [csrfToken ,setCsrfToken] = useState("");
+    const csrfToken = useSelector((state:any)=>state.csrfToken);
+    const dispatch = useDispatch();
+
     const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
         const {target: { name, value }} = e;
         if (name === "email") {
@@ -94,6 +97,7 @@ export default function CreateAccount() {
             window.sessionStorage.setItem("user", response.data);
 
             if(response.status == 201) {
+                console.log(response);
                 alert("로그인 성공");
                 setError("");
                 setLoading(false);
@@ -104,22 +108,32 @@ export default function CreateAccount() {
             if(e instanceof AxiosError){
                 console.log("error : ", e);
                 console.log("e status : ", e.status);
-                setError(e.response?.data);
+                if(e.status === 401) {
+                    setError(e.response?.data);
+                }else if(e.status === 403){
+                    setError(e.response?.data.message);
+                }
+                
             }
         }finally {
             setLoading(false);
         }
     }
 
-    useEffect( ()=>{
-        axios.get("http://localhost:8080/api/csrf-token", { withCredentials: true })
-        .then(response => {
-            setCsrfToken(response.data.token);
-            axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
-        }).catch(e => {
-            console.log(e);
-        })
+    useEffect(()=>{
+        async()=>{
+            try{
+                const response = await axios.get("http://localhost:8080/api/csrf-token", { withCredentials: true })
+                if(response.status == 200) {
+                    dispatch({type: "SET_STRING", payload : response.data.token});
+                }
+            }
+            catch(e){
+                console.log(e);
+            }
+        }
     },[]);
+
     return (
         <Wrapper>
             <Title>Log into X</Title>

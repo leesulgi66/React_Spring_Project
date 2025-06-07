@@ -9,6 +9,8 @@ import reset from "styled-reset"
 import { useEffect, useState } from "react"
 import LoadingScreen from "./components/loading-screen"
 import ProtectedRoute from "./components/protected-rout"
+import axios from "axios"
+import { useDispatch } from "react-redux"
 
 const router = createBrowserRouter([
   {
@@ -69,8 +71,21 @@ const Wrapper = styled.div`
 
 function App() {
   const [isLoading, setLading] = useState(true);
+  const dispatch = useDispatch();
   const init = async() => {
-    setLading(false);
+    try{
+      const response = await axios.get("http://localhost:8080/api/csrf-token", { withCredentials: true })
+      if(response.status == 200) {
+          dispatch({type: "SET_STRING", payload : response.data.token});
+          setLading(false);
+      }
+    }
+    catch(e){
+        console.log(e);
+        setLading(false);
+    }finally{
+      setLading(false);
+    }
   }
   useEffect(()=>{init();},[])
   return <Wrapper>

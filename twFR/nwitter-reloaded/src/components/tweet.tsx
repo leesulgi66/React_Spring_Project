@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { ITweet } from "./timeline";
 import { useEffect, useRef, useState } from "react";
 import axios, { AxiosError } from "axios";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     display: grid;
@@ -102,13 +103,15 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
     const [file, setFile] = useState<File|null>(null);
     const user = window.sessionStorage.getItem("user");
     const userId = memberId.toString();
+    const csrfToken = useSelector((state:any)=>state.csrfToken);
+
     const onDelete = async() => {
         const ok = confirm("Are you sure you want to delete this tweet?");
         if(!ok || false) return;
         try {
             const response = await axios.delete(`http://localhost:8080/api/board/${boardId}`, {
                 headers: {
-                    "Content-Type" : "multipart/form-data",
+                    'X-CSRF-TOKEN': csrfToken,
                 },
                 withCredentials : true,
             });
@@ -143,7 +146,8 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             }
             const response = await axios.put("http://localhost:8080/api/board",formData, {
                 headers: {
-                    "Content-Type" : "multipart/form-data",
+
+                    'X-CSRF-TOKEN': csrfToken,
                 },
                 withCredentials : true,
             });
