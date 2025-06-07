@@ -4,6 +4,7 @@ import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweet";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     display: flex;
@@ -103,6 +104,7 @@ export default function Profile() {
     const [tweets, setTweets] = useState<ITweet[]>([]);
     const [profileUpdate, setProfileUpdate] = useState(false);
     const navigate = useNavigate();
+    const csrfToken = useSelector((state:any)=>state.csrfToken);
     function updateAction() {
         setProfileUpdate((profileUpdate)=>!profileUpdate);
     }
@@ -157,7 +159,7 @@ export default function Profile() {
 
             const response = await axios.patch("http://localhost:8080/api/user",formData, {
                 headers: {
-                    "Content-Type" : "multipart/form-data",
+                    'X-CSRF-TOKEN': csrfToken,
                 },
                 withCredentials : true,
             });
@@ -209,7 +211,7 @@ export default function Profile() {
 
                 const response = await axios.patch("http://localhost:8080/api/user",formData, {
                     headers: {
-                        "Content-Type" : "multipart/form-data",
+                        'X-CSRF-TOKEN': csrfToken,
                     },
                     withCredentials : true,
                 });

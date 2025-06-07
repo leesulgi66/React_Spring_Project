@@ -97,7 +97,6 @@ export default function CreateAccount() {
             window.sessionStorage.setItem("user", response.data);
 
             if(response.status == 201) {
-                console.log(response);
                 alert("로그인 성공");
                 setError("");
                 setLoading(false);
@@ -120,18 +119,20 @@ export default function CreateAccount() {
         }
     }
 
-    useEffect(()=>{
-        async()=>{
-            try{
-                const response = await axios.get("http://localhost:8080/api/csrf-token", { withCredentials: true })
-                if(response.status == 200) {
-                    dispatch({type: "SET_STRING", payload : response.data.token});
-                }
-            }
-            catch(e){
-                console.log(e);
+    const getToken = async()=>{
+        try{
+            const response = await axios.get("http://localhost:8080/api/csrf-token", { withCredentials: true })
+            if(response.status == 200) {
+                dispatch({type: "SET_STRING", payload : response.data.token});
             }
         }
+        catch(e){
+            console.log(e);
+        }
+    }
+
+    useEffect(()=>{
+        getToken();
     },[]);
 
     return (
