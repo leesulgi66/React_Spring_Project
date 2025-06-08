@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Tweet from "./tweet";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export interface ITweet {
     boardId: number;
@@ -27,6 +27,7 @@ const Wrapper = styled.div`
 export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdated: boolean , onTweetPosted: () => void}) {
     const [tweets, setTweets] = useState<ITweet[]>([]);   
     const navigate = useNavigate();
+    const csrfToken = useSelector((state:any) => state.csrfToken);
     const dispatch = useDispatch();
     const fetchTweets = async() => {
         try{
@@ -42,8 +43,8 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
     }
 
     const getToken = async()=>{
-    try{
-        const response = await axios.get("http://localhost:8080/api/csrf-token", { withCredentials: true })
+        try{
+            const response = await axios.get("http://localhost:8080/api/csrf-token", { withCredentials: true })
             if(response.status == 200) {
                 dispatch({type: "SET_STRING", payload : response.data.token});
             }
@@ -55,7 +56,9 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
         
     useEffect(() => {
         fetchTweets();
-        getToken();
+        if(csrfToken === "null"){
+            getToken();
+        }
     }, [tweetsUpdated]); 
     return (<Wrapper> 
         {tweets.map(tweet => <Tweet key={tweet.boardId} {...tweet} onTweetPosted={onTweetPosted} />)}

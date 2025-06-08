@@ -111,7 +111,6 @@ export default function Profile() {
     useEffect(()=>{
         const updatePfo = async()=> {
             if(!user) return;
-            
         }
         updatePfo();
     }, [avatar]);

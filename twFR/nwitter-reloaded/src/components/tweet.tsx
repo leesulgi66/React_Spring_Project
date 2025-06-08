@@ -146,7 +146,6 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             }
             const response = await axios.put("http://localhost:8080/api/board",formData, {
                 headers: {
-
                     'X-CSRF-TOKEN': csrfToken,
                 },
                 withCredentials : true,

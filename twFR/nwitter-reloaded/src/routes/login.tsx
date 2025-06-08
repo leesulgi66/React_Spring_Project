@@ -97,6 +97,8 @@ export default function CreateAccount() {
             window.sessionStorage.setItem("user", response.data);
 
             if(response.status == 201) {
+                const csrfToken = response.headers['x-csrf-token']; 
+                dispatch({type: "SET_STRING", payload : csrfToken});
                 alert("로그인 성공");
                 setError("");
                 setLoading(false);

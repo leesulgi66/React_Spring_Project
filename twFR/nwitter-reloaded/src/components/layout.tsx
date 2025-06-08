@@ -1,6 +1,7 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     display: grid;
@@ -42,12 +43,19 @@ const MenuItem = styled.div`
 
 export default function Layout() {
     const navigate = useNavigate();
+    const csrfToken = useSelector((state:any) => state.csrfToken);
     const onLogOut = async() => {
         const ok = confirm("로그아웃을 원하십니까?");
         if(ok) {
             window.sessionStorage.removeItem("username");
             try{
-                const response = await axios.get("http://localhost:8080/logout",{withCredentials : true});
+                const response = await axios.post("http://localhost:8080/logout",
+                    {
+                        withCredentials : true,
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                });
                 if(response.status === 200){
                     console.log("logout ok");
                     navigate("/login");
