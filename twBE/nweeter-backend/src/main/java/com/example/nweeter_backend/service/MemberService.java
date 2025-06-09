@@ -79,8 +79,8 @@ public class MemberService {
     @Transactional
     public void deleteMember(PrincipalDetails principal) {
         Member member = principal.getMember();
-//        int boards = boardRepository.boards(member.getId());
-//        System.out.println("delete boards count : " + boards);
+        int boards = boardRepository.boards(member.getId());
+        System.out.println("delete boards count : " + boards);
         memberRepository.delete(member);
     }
 }

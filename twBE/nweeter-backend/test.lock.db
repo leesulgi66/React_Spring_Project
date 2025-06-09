@@ -1,6 +1,6 @@
 #FileLock
-#Sun Jun 08 16:25:00 KST 2025
+#Mon Jun 09 22:33:17 KST 2025
 hostName=DESKTOP-4IP1N70
-id=1974e6da623ab2ee3f8272f39960fdb720678ff4fbb
+id=19754e52d21b361d5cdd693d609cb234f7f0a1ce7e8
 method=file
-server=172.30.1.9\:11990
+server=172.30.1.9\:7535

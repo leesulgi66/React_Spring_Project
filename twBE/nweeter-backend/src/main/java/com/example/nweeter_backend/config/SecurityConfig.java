@@ -2,6 +2,7 @@ package com.example.nweeter_backend.config;
 
 import com.example.nweeter_backend.handler.CustomAuthenticationFailureHandler;
 import com.example.nweeter_backend.handler.CustomAuthenticationSuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +35,10 @@ public class SecurityConfig {
                 //.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/login", "/api/user/signIn", "/api/csrf-token").permitAll()
+                        .requestMatchers(
+                                "/api/user/signIn",
+                                "/api/csrf-token",
+                                "/api/board").permitAll()
                         .anyRequest().authenticated()
                 )
                 //.httpBasic(Customizer.withDefaults())
@@ -53,12 +57,18 @@ public class SecurityConfig {
                 .logout((config) -> config
                         .logoutUrl("/logout")
                         .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler((request, response, authentication)->{
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"result\": \"logout ok\"}");
+                        })
                         .permitAll()
                 )
         ;
         http // loginPage disable
                 .exceptionHandling(exceptionHandleConfig -> exceptionHandleConfig
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+
         ;
 
         return http.build();

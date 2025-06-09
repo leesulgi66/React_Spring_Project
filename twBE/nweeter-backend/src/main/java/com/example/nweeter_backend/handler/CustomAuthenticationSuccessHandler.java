@@ -1,5 +1,6 @@
 package com.example.nweeter_backend.handler;
 
+import com.example.nweeter_backend.auth.PrincipalDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,8 +24,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
         System.out.println(csrfToken.getToken());
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         response.setHeader("X-CSRF-TOKEN", csrfToken.getToken());
         response.setStatus(201);
-        response.getWriter().write(authentication.getPrincipal().toString());
+        response.getWriter().write(principal.getMember().getId().toString());
     }
 }
