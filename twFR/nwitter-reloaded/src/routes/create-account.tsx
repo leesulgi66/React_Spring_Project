@@ -3,6 +3,7 @@ import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom";
 import GithubButton from "../components/github-btn";
 import axios, { AxiosError } from "axios";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     height: 100%;
@@ -62,6 +63,8 @@ export default function CreateAccount() {
     const [password, setPassword] = useState("");
     const [passwordCheck, setPasswordCheck] = useState("");
     const [error, setError] = useState("");
+    const csrfToken = useSelector((state:any)=>state.csrfToken);
+
     const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
         const {target: { name, value }} = e;
         if (name === "username") {
@@ -90,7 +93,11 @@ export default function CreateAccount() {
                     password,
                     email               
                 },
-                {withCredentials : true});
+                {   
+                    headers: { 'X-CSRF-TOKEN': csrfToken },
+                    withCredentials : true,
+                },
+            );
             
             console.log(response);
 
@@ -103,6 +110,7 @@ export default function CreateAccount() {
         }catch(e) {
             if(e instanceof AxiosError){
                 console.log(e.response);
+                if(e.response?.status === 500)
                 setError(e.response?.data);
             }
         }finally {

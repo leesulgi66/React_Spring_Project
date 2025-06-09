@@ -93,10 +93,9 @@ export default function CreateAccount() {
                 }
             });
 
-            //console.log("로그인 data : ",response.data); // username
-            window.sessionStorage.setItem("user", response.data);
-
-            if(response.status == 201) {
+            if(response.status === 201) {
+                //console.log("로그인 data : ",response.data); // user id
+                window.sessionStorage.setItem("user", response.data);
                 const csrfToken = response.headers['x-csrf-token']; 
                 dispatch({type: "SET_STRING", payload : csrfToken});
                 alert("로그인 성공");
@@ -104,17 +103,16 @@ export default function CreateAccount() {
                 setLoading(false);
                 navigate("/");
             }
+
+            if(response.status === 200) {
+                setError(response?.data);
+            }
             
         }catch(e) {
             if(e instanceof AxiosError){
                 console.log("error : ", e);
                 console.log("e status : ", e.status);
-                if(e.status === 401) {
-                    setError(e.response?.data);
-                }else if(e.status === 403){
-                    setError(e.response?.data.message);
-                }
-                
+                setError(e.name);
             }
         }finally {
             setLoading(false);

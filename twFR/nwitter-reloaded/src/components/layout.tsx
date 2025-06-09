@@ -47,21 +47,21 @@ export default function Layout() {
     const onLogOut = async() => {
         const ok = confirm("로그아웃을 원하십니까?");
         if(ok) {
-            window.sessionStorage.removeItem("username");
             try{
-                const response = await axios.post("http://localhost:8080/logout",
-                    {
-                        withCredentials : true,
-                        headers: {
-                            'X-CSRF-TOKEN': csrfToken,
-                        },
+                const response = await axios.post("http://localhost:8080/logout",{},{
+                    withCredentials : true,
+                    headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    },
                 });
                 if(response.status === 200){
+                    window.sessionStorage.removeItem("user");
                     console.log("logout ok");
-                    navigate("/login");
+                    navigate("/");
                 }
             }catch(e){
-                navigate("/login");
+                console.log(e);
+                //navigate("/login");
         }
     }
 }

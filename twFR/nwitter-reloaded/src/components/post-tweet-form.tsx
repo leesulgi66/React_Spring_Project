@@ -101,6 +101,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             });
 
             if(response.status == 200) {
+                console.log(response)
                 setLoading(false);
                 onTweetPosted();
             }

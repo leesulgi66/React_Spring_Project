@@ -238,13 +238,13 @@ export default function Profile() {
         try{
             const response = await axios.delete("http://localhost:8080/api/user", {
                 headers: {
-                    "Content-Type" : "multipart/form-data",
+                    'X-CSRF-TOKEN': csrfToken,
                 },
                 withCredentials : true,
             });
 
             if(response.status == 200) {
-                navigate("/login");
+                navigate("/");
             }
         }catch(e){  
             console.log(e);
