@@ -5,16 +5,22 @@ function reducer(currentState, action) {
     if(currentState === undefined) {
         return {
             csrfToken: "null",
-            login: true,
+            login: false,
         }
     }
     const newState = {...currentState};
-
-    if (action.type === "SET_STRING") {
+    ///////////////////////////////////
+    if(action.type === "SET_STRING") {
         return {
             ...newState,
             csrfToken: action.payload
         };
+    }
+    if(action.type === "SET_LOGIN") {
+        return {
+            ...newState,
+            login: action.payload
+        }
     }
 
     return newState;

@@ -63,6 +63,7 @@ export default function CreateAccount() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const csrfToken = useSelector((state:any)=>state.csrfToken);
+    const loginState = useSelector((state:any) => state.login);
     const dispatch = useDispatch();
 
     const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
@@ -95,6 +96,7 @@ export default function CreateAccount() {
             if(response.status === 201) {
                 //console.log("로그인 data : ",response.data); // user id
                 window.sessionStorage.setItem("user", response.data);
+                dispatch({type: "SET_LOGIN", payload: true});
                 const csrfToken = response.headers['x-csrf-token']; 
                 dispatch({type: "SET_STRING", payload : csrfToken});
                 alert("로그인 성공");
