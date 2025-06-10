@@ -64,6 +64,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     const [tweet, setTweet] = useState("");
     const [file, setFile] = useState<File|null>(null);
     const [user, setUser] = useState(window.sessionStorage.getItem("user"));
+    const loginState = useSelector((state:any) => state.login);
     const csrfToken = useSelector((state:any)=>state.csrfToken);
     const navigate = useNavigate();
 
@@ -71,8 +72,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
         setTweet(e.target.value);
     }
     const onClick = () => {
-        console.log(user);
-        if(user === null) {
+        if(loginState === false) {
             navigate("/login")
         }
     }
