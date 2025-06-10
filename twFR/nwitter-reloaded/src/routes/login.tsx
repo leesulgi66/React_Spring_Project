@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import GithubButton from "../components/github-btn";
 import axios, { AxiosError } from "axios";
 import { useDispatch, useSelector } from "react-redux";
+import CsrfToken from "../components/csrfTokenGet";
 
 const Wrapper = styled.div`
     height: 100%;
@@ -77,8 +78,6 @@ export default function CreateAccount() {
         if(isLoading || email === "" || password === "") return;
         try{
             setLoading(true);
-            console.log(email);
-
             const formData = new FormData();
             formData.append("email", email);
             formData.append("password", password);
@@ -113,26 +112,27 @@ export default function CreateAccount() {
                 console.log("error : ", e);
                 console.log("e status : ", e.status);
                 setError(e.name);
+                if(e.status === 401) {
+                    if(e.message === "Request failed with status code 401"){
+                        CsrfToken().then(token => {
+                            getToken(token);
+                        });
+                    }
+                }
             }
         }finally {
             setLoading(false);
         }
     }
 
-    const getToken = async()=>{
-        try{
-            const response = await axios.get("http://localhost:8080/api/csrf-token", { withCredentials: true })
-            if(response.status == 200) {
-                dispatch({type: "SET_STRING", payload : response.data.token});
-            }
-        }
-        catch(e){
-            console.log(e);
-        }
+    const getToken = async(token:string)=>{
+        dispatch({type: "SET_STRING", payload : token});
     }
 
     useEffect(()=>{
-        getToken();
+        CsrfToken().then(token => {
+            getToken(token);
+        });
     },[]);
 
     return (

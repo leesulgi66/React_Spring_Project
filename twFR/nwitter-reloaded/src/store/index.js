@@ -5,7 +5,7 @@ function reducer(currentState, action) {
     if(currentState === undefined) {
         return {
             csrfToken: "null",
-            test: 1,
+            login: true,
         }
     }
     const newState = {...currentState};

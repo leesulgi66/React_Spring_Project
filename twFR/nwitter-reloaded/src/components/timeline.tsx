@@ -4,6 +4,7 @@ import Tweet from "./tweet";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import CsrfToken from "./csrfTokenGet";
 
 export interface ITweet {
     boardId: number;
@@ -36,28 +37,22 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
         }catch(e){
             if(e instanceof AxiosError) {
                 console.log(e.message);
-                alert("Please Log in");
-                navigate("/login");
+                alert("Server is down");
+                //navigate("/login");
             }
         }
     }
 
-    const getToken = async()=>{
-        try{
-            const response = await axios.get("http://localhost:8080/api/csrf-token", { withCredentials: true })
-            if(response.status == 200) {
-                dispatch({type: "SET_STRING", payload : response.data.token});
-            }
-        }
-        catch(e){
-            console.log(e);
-        }
+    const getToken = async(token:string)=>{
+        dispatch({type: "SET_STRING", payload : token});
     }
         
     useEffect(() => {
         fetchTweets();
         if(csrfToken === "null"){
-            getToken();
+            CsrfToken().then(token => {
+                getToken(token);
+            });
         }
     }, [tweetsUpdated]); 
     return (<Wrapper> 
