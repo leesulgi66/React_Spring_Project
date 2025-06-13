@@ -46,10 +46,15 @@ const MenuItem = styled.div`
 `;
 
 export default function Layout() {
+    const user = window.sessionStorage.getItem("user");
     const navigate = useNavigate();
     const csrfToken = useSelector((state:any) => state.csrfToken);
     const loginState = useSelector((state:any) => state.login);
     const dispatch = useDispatch();
+    console.log("user:",user);
+    if(user !== null) {
+        dispatch({type: "SET_LOGIN", payload: true});
+    }
 
     const onLogIn = ()=> {
         navigate("/login")
