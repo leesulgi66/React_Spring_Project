@@ -8,8 +8,6 @@ import 'react-quill/dist/quill.snow.css'
 import DOMPurify from 'dompurify';
 
 const Wrapper = styled.div`
-    display: grid;
-    grid-template-columns: 1fr;
     padding: 20px;
     border: 1px solid rgba(255,255,255,0.5);
     border-radius: 15px;
@@ -22,22 +20,31 @@ const Column = styled.div`
     }
 `;
 
-const Photo = styled.img`
-    //width: 100px;
-    //height: 100px;
-    //border-radius: 15px;
-`;
-
 const Username = styled.span`
     font-weight: 600;
     font-size: 15px;
 `;
 
-const Payload = styled.p`
+const Payload = styled.div`
+    position: relative;
     margin: 10px 0px;
-    font-size: 18px;
-    word-break: break-all; // 단어가 분리 되어도 줄 바꿈
-    white-space: pre-wrap; // with를 넘어가면 줄바꿈
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+      /* 모든 내용 보이게 */
+    min-height: 100px;
+
+    /* Payload 아래의 iframe에 적용 */
+    iframe {
+    //position: absolute;
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    margin: 1rem 0;
+    border: 0;
+  }
 `;
 
 const DeleteButton = styled.button`
@@ -208,22 +215,21 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
         ],
     };
 
-    const cleanHtml = DOMPurify.sanitize(tweet);
+    const cleanHtml = DOMPurify.sanitize(tweet, {
+        ADD_TAGS: ["iframe"],
+        ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "src", "height", "width"],
+        ALLOWED_URI_REGEXP: /^https?:\/\/(www\.youtube\.com|youtube\.com|player\.vimeo\.com)\//,
+    });
 
     return (<Wrapper>
         <Column>
             <Username>{memberName}</Username>
             {isEdit ? <ReactQuill className="quill_text_box" value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
-            <Payload ><div dangerouslySetInnerHTML={{ __html: cleanHtml }}/></Payload>}
+            <Payload dangerouslySetInnerHTML={{ __html: cleanHtml }}></Payload>}
             {user === userId ? <DeleteButton onClick={onDelete}>Delete</DeleteButton> : null}
             {user === userId ? isEdit ? <DeleteButton className="cancelBtn" onClick={onEdit}>cancel</DeleteButton> :<DeleteButton onClick={onEdit}>Eidt</DeleteButton> : null}
             {user === userId ? isEdit ? <DeleteButton className="editSubmitBtn" onClick={onEditSubmit}>Edit Tweet</DeleteButton> : null : null}
         </Column>
-        {/*<Column className="photoBox">
-            {viewPhoto === null ? null : <Photo src={viewPhoto} /> }
-            {isEdit ? <FileChangeButton htmlFor={boardId.toString()}> edit </ FileChangeButton>: null}
-            <FileChangeInput onChange={onFileChange} type="file" id={boardId.toString()} accept="image/*" />
-        </Column>*/}
     </Wrapper>
     )
 }

@@ -51,7 +51,6 @@ export default function Layout() {
     const csrfToken = useSelector((state:any) => state.csrfToken);
     const loginState = useSelector((state:any) => state.login);
     const dispatch = useDispatch();
-    console.log("user:",user);
     if(user !== null) {
         dispatch({type: "SET_LOGIN", payload: true});
     }
