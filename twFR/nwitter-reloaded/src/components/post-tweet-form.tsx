@@ -1,5 +1,7 @@
 import axios, { AxiosError } from "axios";
 import React, { useState } from "react";
+import ReactQuill from "react-quill";
+import 'react-quill/dist/quill.snow.css'
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components"
@@ -89,7 +91,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     }
     const onSubmit = async(e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if(isLoading || tweet === "" || tweet.length > 180) return;
+        if(isLoading || tweet === "" || tweet.length > 5000) return;
         try{
             setLoading(true);
             if(user === null) return
@@ -107,7 +109,6 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             });
 
             if(response.status == 200) {
-                console.log(response)
                 setLoading(false);
                 onTweetPosted();
             }
@@ -125,11 +126,21 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             setFile(null);
         }
     }
+
+    const modules = {
+        toolbar: [
+        [{ 'header': [1, 2, false] }],
+        ['bold', 'italic', 'underline','strike', 'blockquote'],
+        [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+        ['link', 'image', 'video'],
+        ['clean']
+        ],
+    };
     return (
     <Form onSubmit={onSubmit}>
-        <TextArea required rows={5} maxLength={180} onChange={onChange} onClick={onClick} value={tweet} placeholder="What is happening?"/>
-        <AttachFileButton htmlFor="file">{file ? "Photo added ✅" : "Add photo"}</AttachFileButton>
-        <AttachFileInput onChange={onFileChange} type="file" id="file" accept="image/*" />
+        <div>
+            <ReactQuill className="quill_text_box" value={tweet} onFocus={onClick} onChange={setTweet} modules={modules} theme="snow"/>
+        </div>
         <SubmitBtn type="submit" value={isLoading ? "Posting..." : "Post Tweet"}/>
     </Form>
     )

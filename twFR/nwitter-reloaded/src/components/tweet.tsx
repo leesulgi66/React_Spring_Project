@@ -3,10 +3,13 @@ import { ITweet } from "./timeline";
 import { useEffect, useRef, useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useSelector } from "react-redux";
+import ReactQuill from "react-quill";
+import 'react-quill/dist/quill.snow.css'
+import DOMPurify from 'dompurify';
 
 const Wrapper = styled.div`
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 1fr;
     padding: 20px;
     border: 1px solid rgba(255,255,255,0.5);
     border-radius: 15px;
@@ -20,9 +23,9 @@ const Column = styled.div`
 `;
 
 const Photo = styled.img`
-    width: 100px;
-    height: 100px;
-    border-radius: 15px;
+    //width: 100px;
+    //height: 100px;
+    //border-radius: 15px;
 `;
 
 const Username = styled.span`
@@ -60,7 +63,7 @@ const DeleteButton = styled.button`
 `;
 
 const FileChangeButton = styled.label`
-    display: inline-block;
+    /* display: inline-block;
     margin: 3% 20%;
     text-align: center;
     width: 35%;
@@ -69,7 +72,7 @@ const FileChangeButton = styled.label`
     border: 1px solid white;
     text-transform: uppercase;
     font-size: 11px;
-    cursor: pointer;
+    cursor: pointer; */
 `;
 
 const FileChangeInput = styled.input`
@@ -195,20 +198,32 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
         };
     }, [file]);
 
+        const modules = {
+        toolbar: [
+        [{ 'header': [1, 2, false] }],
+        ['bold', 'italic', 'underline','strike', 'blockquote'],
+        [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+        ['link', 'image', 'video'],
+        ['clean']
+        ],
+    };
+
+    const cleanHtml = DOMPurify.sanitize(tweet);
+
     return (<Wrapper>
         <Column>
             <Username>{memberName}</Username>
-            {isEdit ? <TextArea required rows={2} maxLength={180} value={changeTweet} onChange={onChange}/>:
-            <Payload>{tweet}</Payload>}
+            {isEdit ? <ReactQuill className="quill_text_box" value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
+            <Payload ><div dangerouslySetInnerHTML={{ __html: cleanHtml }}/></Payload>}
             {user === userId ? <DeleteButton onClick={onDelete}>Delete</DeleteButton> : null}
             {user === userId ? isEdit ? <DeleteButton className="cancelBtn" onClick={onEdit}>cancel</DeleteButton> :<DeleteButton onClick={onEdit}>Eidt</DeleteButton> : null}
             {user === userId ? isEdit ? <DeleteButton className="editSubmitBtn" onClick={onEditSubmit}>Edit Tweet</DeleteButton> : null : null}
         </Column>
-        <Column className="photoBox">
+        {/*<Column className="photoBox">
             {viewPhoto === null ? null : <Photo src={viewPhoto} /> }
             {isEdit ? <FileChangeButton htmlFor={boardId.toString()}> edit </ FileChangeButton>: null}
             <FileChangeInput onChange={onFileChange} type="file" id={boardId.toString()} accept="image/*" />
-        </Column>
+        </Column>*/}
     </Wrapper>
     )
 }
