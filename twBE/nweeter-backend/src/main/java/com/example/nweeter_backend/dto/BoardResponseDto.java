@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class BoardResponseDto {
     private Long boardId;
     private String tweet;
-    private String photo;
     private Long memberId;
     private LocalDateTime insertTime;
     private LocalDateTime updateTime;

@@ -18,12 +18,8 @@ public class Board {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String tweet;
-
-    private String photo;
-
-    private String photoKey;
 
     @CreationTimestamp
     @Column(name = "time_ins")

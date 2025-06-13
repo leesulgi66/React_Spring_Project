@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -26,11 +25,6 @@ public class BoardService {
     @Transactional
     public void save(BoardRequestDto dto, Member member) throws IOException {
         Board board = new Board();
-        if(dto.getFile() != null){
-            List<String> imgUrlPath = imageHandler.save(dto.getFile(), "board_"+dto.getUser()+dto.getFile().getOriginalFilename());
-            board.setPhotoKey(imgUrlPath.get(0)); // path
-            board.setPhoto(imgUrlPath.get(1)); // uri
-        }
         board.setMember(member);
         board.setTweet(dto.getTweet());
         boardRepository.save(board);
@@ -55,21 +49,8 @@ public class BoardService {
         if(!Objects.equals(board.getMember().getId(), member.getId())) {
             throw new IOException("not equal user");
         }
-        String photo = board.getPhoto();
-        String photoKey = board.getPhotoKey();
-        if(board.getPhotoKey() != null) {
-            photo = board.getPhoto();
-            photoKey = board.getPhotoKey();
-        }
-        if(dto.getFile() != null){
-            List<String> imgUrlPath = imageHandler.save(dto.getFile(), "board"+dto.getUser());
-            photoKey = (imgUrlPath.get(0)); // path
-            photo = (imgUrlPath.get(1)); // uri
-        }
         board.setMember(member);
         board.setTweet(dto.getTweet());
-        board.setPhoto(photo);
-        board.setPhotoKey(photoKey);
         boardRepository.save(board);
         System.out.println("board update ok");
     }
@@ -83,7 +64,6 @@ public class BoardService {
                 BoardResponseDto.builder()
                         .boardId(p.getId())
                         .tweet(p.getTweet())
-                        .photo(p.getPhoto())
                         .memberId(p.getMember().getId())
                         .memberName(p.getMember().getUsername())
                         .insertTime(p.getInsertTime())
