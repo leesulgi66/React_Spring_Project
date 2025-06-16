@@ -17,6 +17,7 @@ const Wrapper = styled.div`
 
 const Title = styled.h1`
     font-size: 42px;
+    cursor: pointer;
 `;
 
 const Form = styled.form`
@@ -131,6 +132,10 @@ export default function CreateAccount() {
         dispatch({type: "SET_STRING", payload : token});
     }
 
+    const onFocus = ()=>{
+        navigate('/');
+    }
+
     useEffect(()=>{
         CsrfToken().then(token => {
             getToken(token);
@@ -139,7 +144,7 @@ export default function CreateAccount() {
 
     return (
         <Wrapper>
-            <Title>Log into X</Title>
+            <Title onClick={onFocus}>Log into X</Title>
             <Form onSubmit={onSubmit}>
                 <Input onChange={onChange} name="email" value={email} placeholder="Email" type="text" required/>
                 <Input onChange={onChange} name="password" value={password} placeholder="Password" type="password" required/>

@@ -61,6 +61,16 @@ const SubmitBtn = styled.input`
     }
 `;
 
+const StyledQuill = styled(ReactQuill)`
+    .ql-editor {
+    min-height: 120px;
+    font-size: 1.2em;
+    }
+    .ql-toolbar {
+    background-color: #b2e0ff;
+    }
+`;
+
 export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => void }) {
     const [isLoading, setLoading] = useState(false);
     const [tweet, setTweet] = useState("");
@@ -75,7 +85,13 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     }
     const onClick = () => {
         if(loginState === false) {
-            navigate("/login")
+            const ok = confirm("로그인이 필요합니다.");
+            if(!ok) {
+                (document.activeElement as HTMLElement).blur() 
+                navigate("/");
+            }else {
+                navigate("/login");
+            }
         }
     }
     const onFileChange = (e: React.ChangeEvent<HTMLInputElement>)=> {
@@ -139,7 +155,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     return (
     <Form onSubmit={onSubmit}>
         <div>
-            <ReactQuill className="quill_text_box" value={tweet} onFocus={onClick} onChange={setTweet} modules={modules} theme="snow"/>
+            <StyledQuill className="quill_text_box" value={tweet} onFocus={onClick} onChange={setTweet} modules={modules} theme="snow"/>
         </div>
         <SubmitBtn type="submit" value={isLoading ? "Posting..." : "Post Tweet"}/>
     </Form>

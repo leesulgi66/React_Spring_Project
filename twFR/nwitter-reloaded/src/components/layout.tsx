@@ -5,13 +5,16 @@ import { useDispatch, useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     display: grid;
-    margin-right: 10px;
+    margin: 0 10px;
     gap : 50px;
-    grid-template-columns: 1fr 4fr;
+    grid-template-columns: 1fr 6fr;
     height: 100%;
     padding : 50px 0px;
     width: 100%;
     max-width: 860px;
+    @media (max-width:500px) {
+        display: block;
+    }
 `;
 
 const Menu = styled.div`
@@ -19,6 +22,10 @@ const Menu = styled.div`
     flex-direction: column;
     align-items: center;
     gap: 20px;
+    @media (max-width:500px) {
+        flex-direction: row;
+        justify-content: center;
+    }
 `;
 
 const MenuItem = styled.div`

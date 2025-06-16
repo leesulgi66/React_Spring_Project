@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { ITweet } from "./timeline";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useSelector } from "react-redux";
 import ReactQuill from "react-quill";
@@ -31,8 +31,7 @@ const Payload = styled.div`
     width: 100%;
     height: 100%;
     overflow: hidden;
-      /* 모든 내용 보이게 */
-    min-height: 100px;
+    min-height: 30px;
 
     /* Payload 아래의 iframe에 적용 */
     iframe {
@@ -42,9 +41,8 @@ const Payload = styled.div`
     width: 100%;
     aspect-ratio: 16 / 9;
     height: auto;
-    margin: 1rem 0;
     border: 0;
-  }
+    }
 `;
 
 const DeleteButton = styled.button`
@@ -105,6 +103,17 @@ const TextArea = styled.textarea`
     }
 `;
 
+const StyledQuill = styled(ReactQuill)`
+    .ql-editor {
+    min-height: 40px;
+    font-size: 1.2em;
+    }
+    .ql-toolbar {
+    background-color: #b2e0ff;
+    }
+`;
+
+
 export default function Tweet({memberName, photo, tweet, boardId, memberId, photoKey,onTweetPosted}:ITweet) {
     const [isLoading, setLoading] = useState(false);
     const [isEdit, setEdit] = useState(false);
@@ -114,6 +123,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
     const user = window.sessionStorage.getItem("user");
     const userId = memberId.toString();
     const csrfToken = useSelector((state:any)=>state.csrfToken);
+    console.log(tweet);
 
     const onDelete = async() => {
         const ok = confirm("Are you sure you want to delete this tweet?");
@@ -216,15 +226,15 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
     };
 
     const cleanHtml = DOMPurify.sanitize(tweet, {
-        ADD_TAGS: ["iframe"],
-        ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "src", "height", "width"],
+        ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'ul', 'ol', 'li', 'iframe',/* 추가적인 태그 */],
+        ALLOWED_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "src", "height", "width"],
         ALLOWED_URI_REGEXP: /^https?:\/\/(www\.youtube\.com|youtube\.com|player\.vimeo\.com)\//,
     });
 
     return (<Wrapper>
         <Column>
             <Username>{memberName}</Username>
-            {isEdit ? <ReactQuill className="quill_text_box" value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
+            {isEdit ? <StyledQuill value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
             <Payload dangerouslySetInnerHTML={{ __html: cleanHtml }}></Payload>}
             {user === userId ? <DeleteButton onClick={onDelete}>Delete</DeleteButton> : null}
             {user === userId ? isEdit ? <DeleteButton className="cancelBtn" onClick={onEdit}>cancel</DeleteButton> :<DeleteButton onClick={onEdit}>Eidt</DeleteButton> : null}
