@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { ITweet } from "./timeline";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useSelector } from "react-redux";
 import ReactQuill from "react-quill";
@@ -32,6 +32,7 @@ const Payload = styled.div`
     height: 100%;
     overflow: hidden;
     min-height: 30px;
+    max-width: 100%;
 
     /* Payload 아래의 iframe에 적용 */
     iframe {
@@ -42,6 +43,11 @@ const Payload = styled.div`
     aspect-ratio: 16 / 9;
     height: auto;
     border: 0;
+    }
+
+    img {
+    max-width: 100%;
+    height: auto;
     }
 `;
 
@@ -105,9 +111,9 @@ const TextArea = styled.textarea`
 
 const StyledQuill = styled(ReactQuill)`
     .ql-editor {
-    min-height: 40px;
+    min-height: 80px;
     font-size: 1.2em;
-    }
+    }   
     .ql-toolbar {
     background-color: #b2e0ff;
     }
@@ -123,7 +129,6 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
     const user = window.sessionStorage.getItem("user");
     const userId = memberId.toString();
     const csrfToken = useSelector((state:any)=>state.csrfToken);
-    console.log(tweet);
 
     const onDelete = async() => {
         const ok = confirm("Are you sure you want to delete this tweet?");
@@ -215,19 +220,19 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
         };
     }, [file]);
 
-        const modules = {
+    const modules = {
         toolbar: [
-        [{ 'header': [1, 2, false] }],
-        ['bold', 'italic', 'underline','strike', 'blockquote'],
-        [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-        ['link', 'image', 'video'],
-        ['clean']
+            [{ 'header': [1, 2, false] }],
+            ['bold', 'italic', 'underline','strike', 'blockquote'],
+            [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+            ['link', 'image', 'video'],
+            ['clean']
         ],
     };
 
     const cleanHtml = DOMPurify.sanitize(tweet, {
-        ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'ul', 'ol', 'li', 'iframe',/* 추가적인 태그 */],
-        ALLOWED_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "src", "height", "width"],
+        ADD_TAGS: ["iframe"],
+        ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "src", "height", "width"],
         ALLOWED_URI_REGEXP: /^https?:\/\/(www\.youtube\.com|youtube\.com|player\.vimeo\.com)\//,
     });
 

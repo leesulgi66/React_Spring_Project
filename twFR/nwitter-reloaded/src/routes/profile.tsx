@@ -4,7 +4,7 @@ import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweet";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     display: flex;
@@ -40,7 +40,7 @@ const Tweets = styled.div`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 65%;
+    width: 80%;
 `;
 
 const Name = styled.div`
@@ -105,6 +105,8 @@ export default function Profile() {
     const [profileUpdate, setProfileUpdate] = useState(false);
     const navigate = useNavigate();
     const csrfToken = useSelector((state:any)=>state.csrfToken);
+    const dispatch = useDispatch();
+
     function updateAction() {
         setProfileUpdate((profileUpdate)=>!profileUpdate);
     }
@@ -244,6 +246,8 @@ export default function Profile() {
             });
 
             if(response.status == 200) {
+                window.sessionStorage.removeItem("user");
+                dispatch({type: "SET_LOGIN", payload: false});
                 navigate("/");
             }
         }catch(e){  

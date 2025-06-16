@@ -107,7 +107,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     }
     const onSubmit = async(e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if(isLoading || tweet === "" || tweet.length > 5000) return;
+        if(isLoading || tweet === "") return;
         try{
             setLoading(true);
             if(user === null) return

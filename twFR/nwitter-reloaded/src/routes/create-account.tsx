@@ -104,7 +104,7 @@ export default function CreateAccount() {
             if(response.status == 200) {
                 alert("회원가입 완료");
                 setLoading(false);
-                navigate("/");
+                navigate("/login");
             }
             
         }catch(e) {
