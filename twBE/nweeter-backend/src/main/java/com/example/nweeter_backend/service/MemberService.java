@@ -55,15 +55,12 @@ public class MemberService {
 
     @Transactional
     public void patchMember(MultipartFile file, PrincipalDetails principal) throws IOException {
+        String url = "http://127.0.0.1:8080";
         Member member = memberRepository.findById(principal.getMember().getId()).orElseThrow(
                 ()-> new IllegalArgumentException("can not find user"));
-        List<String> imgUrlPath = imageHandler.save(file, "userImg-"+principal.getUsername());
-        if(member.getUsername().equals(principal.getUsername())){
-            if(!member.getProfileImageKey().equals(imgUrlPath.get(0))){
-                imageHandler.deleteFile(member.getProfileImageKey());
-            }
-            member.setProfileImageKey(imgUrlPath.get(0)); // location
-            member.setProfileImage(imgUrlPath.get(1)); // uri
+        String imgUrl = imageHandler.save(file, "userImg-"+principal.getMember().getId());
+        if(member.getId().equals(principal.getMember().getId())){
+            member.setProfileImage(url+imgUrl);
         }
     }
 

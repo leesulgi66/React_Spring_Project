@@ -55,9 +55,11 @@ public class MemberApiController {
                              @AuthenticationPrincipal PrincipalDetails principal) throws IOException {
         log.info("user patch call");
         if(file != null) {
+            log.info("user patch file");
             memberService.patchMember(file, principal);
         }
         if(username != null) {
+            log.info("user patch username");
             memberService.patchMember(username, principal);
         }
         return new ResponseEntity<>("member patch ok", HttpStatus.OK);

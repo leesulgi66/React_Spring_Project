@@ -8,21 +8,27 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Component
 public class ImageHandler {
-    public List<String> save(MultipartFile image, String key) throws IOException {
-        String fileExtension = Objects.requireNonNull(image.getOriginalFilename()).split("\\.")[1];
-        String uri = "http://localhost:8080/image/" + key+ "."+fileExtension;
-        String fullPathName = "C:\\Users\\leesu\\Desktop\\react_spring\\react-spring\\React_Spring_Project\\twBE\\nweeter-backend\\src\\main\\resources\\static\\image\\" + key +"."+fileExtension;
-        image.transferTo(new File(fullPathName));
-        List<String> list = new ArrayList<>();
-        list.add(0, fullPathName);
-        list.add(1, uri);
-        return list;
+    public String save(MultipartFile image, String key) throws IOException {
+        String fileExtension = "."+Objects.requireNonNull(image.getOriginalFilename()).split("\\.")[1];
+        //String uri = "http://localhost:8080/image/" + key ;
+        String uploadDirectory = "D:\\images\\";
+
+        try{
+            // 폴더 없으면 생성
+            File images = new File(uploadDirectory);
+            if (!images.exists()) {
+                images.mkdirs();
+            }
+            image.transferTo(new File(uploadDirectory, key+fileExtension));
+        }catch(IOException e){
+            System.out.println("error : " + e.getMessage());
+        }
+
+        return "/images/" + key+fileExtension;
     }
 
     public void deleteFile(String filePath){
