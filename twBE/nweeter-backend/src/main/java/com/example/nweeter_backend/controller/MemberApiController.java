@@ -45,7 +45,6 @@ public class MemberApiController {
         log.info("user info call");
         Long userId = principal.getMember().getId();
         MemberInfoResponseDto memberInfo = memberService.getInfo(userId);
-        System.out.println(memberInfo);
         return new ResponseEntity<>(memberInfo, HttpStatus.OK);
     }
 

@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RestController
@@ -31,6 +32,8 @@ public class BoardApiController {
     @PostMapping("/board")
     public ResponseEntity<String> boardPost(@ModelAttribute BoardRequestDto dto, @AuthenticationPrincipal PrincipalDetails principal) throws IOException {
         log.info("board post call");
+        int byteSize = dto.getTweet().getBytes(StandardCharsets.UTF_8).length;
+        System.out.println("tweet size : "+byteSize);
         boardService.save(dto, principal.getMember());
         return new ResponseEntity<>("save ok", HttpStatus.OK);
     }

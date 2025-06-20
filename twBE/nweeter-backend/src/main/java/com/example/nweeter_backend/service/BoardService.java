@@ -2,7 +2,6 @@ package com.example.nweeter_backend.service;
 
 import com.example.nweeter_backend.dto.BoardRequestDto;
 import com.example.nweeter_backend.dto.BoardResponseDto;
-import com.example.nweeter_backend.handler.ImageHandler;
 import com.example.nweeter_backend.modle.Board;
 import com.example.nweeter_backend.modle.Member;
 import com.example.nweeter_backend.repository.BoardRepository;
@@ -20,7 +19,6 @@ import java.util.Objects;
 public class BoardService {
 
     final private BoardRepository boardRepository;
-    final private ImageHandler imageHandler;
 
     @Transactional
     public void save(BoardRequestDto dto, Member member) throws IOException {

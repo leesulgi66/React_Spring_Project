@@ -4,7 +4,6 @@ import com.example.nweeter_backend.auth.PrincipalDetails;
 import com.example.nweeter_backend.dto.MemberInfoResponseDto;
 import com.example.nweeter_backend.dto.MemberSignInRequestDto;
 import com.example.nweeter_backend.handler.ImageHandler;
-import com.example.nweeter_backend.modle.Board;
 import com.example.nweeter_backend.modle.Member;
 import com.example.nweeter_backend.repository.BoardRepository;
 import com.example.nweeter_backend.repository.MemberRepository;
@@ -55,12 +54,15 @@ public class MemberService {
 
     @Transactional
     public void patchMember(MultipartFile file, PrincipalDetails principal) throws IOException {
-        String url = "http://127.0.0.1:8080";
         Member member = memberRepository.findById(principal.getMember().getId()).orElseThrow(
                 ()-> new IllegalArgumentException("can not find user"));
-        String imgUrl = imageHandler.save(file, "userImg-"+principal.getMember().getId());
+        if(member.getProfileImage() != null){
+            imageHandler.deleteFile(member.getProfileImageKey());
+        }
+        List<String> imgList = imageHandler.save(file, "userImg-"+principal.getMember().getId());
         if(member.getId().equals(principal.getMember().getId())){
-            member.setProfileImage(url+imgUrl);
+            member.setProfileImage(imgList.get(0));
+            member.setProfileImageKey(imgList.get(1));
         }
     }
 
