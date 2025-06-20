@@ -68,7 +68,6 @@ export default function Layout() {
     }
 
     const onLogOut = async() => {
-        console.log(loginState);
         const ok = confirm("로그아웃을 원하십니까?");
         if(ok) {
             try{
@@ -81,15 +80,18 @@ export default function Layout() {
                 if(response.status === 200){
                     window.sessionStorage.removeItem("user");
                     dispatch({type: "SET_LOGIN", payload: false});
-                    console.log("logout ok");
                     navigate("/");
                 }
             }catch(e){
                 console.log(e);
                 //navigate("/login");
+            }finally {
+                window.sessionStorage.removeItem("user");
+                dispatch({type: "SET_LOGIN", payload: false});
+                document.cookie = "JSESSIONID" + '=; expires=Thu, 01 Jan 1999 00:00:10 GMT;';
+            }
         }
     }
-}
     return (
         <Wrapper>
             <Menu>

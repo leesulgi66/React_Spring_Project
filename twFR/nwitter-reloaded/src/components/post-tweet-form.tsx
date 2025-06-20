@@ -63,11 +63,25 @@ const SubmitBtn = styled.input`
 
 const StyledQuill = styled(ReactQuill)`
     .ql-editor {
-    min-height: 120px;
-    font-size: 1.2em;
+        min-height: 120px;
+        font-size: 1.2em;
+        &:focus {
+        border: solid 1px;
+        border-color: #1d9bf0;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        }
     }
     .ql-toolbar {
-    background-color: #b2e0ff;
+        background-color: #b2e0ff;
+    }
+    .ql-container {
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+    .ql-toolbar {
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
     }
 `;
 
@@ -144,13 +158,18 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     }
 
     const modules = {
-        toolbar: [
-        [{ 'header': [1, 2, false] }],
-        ['bold', 'italic', 'underline','strike', 'blockquote'],
-        [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-        ['link', 'image', 'video'],
-        ['clean']
-        ],
+        toolbar: {
+            container: [
+                [{ 'header': [1, 2, false] }],
+                ['bold', 'italic', 'underline','strike', 'blockquote'],
+                [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+                ['link', 'image', 'video'],
+                ['clean']
+            ],
+            handlers: {
+                //image: imageHandler
+            }
+        }
     };
     return (
     <Form onSubmit={onSubmit}>

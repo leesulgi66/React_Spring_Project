@@ -5,6 +5,7 @@ import Tweet from "../components/tweet";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import CsrfToken from "../components/csrfTokenGet";
 
 const Wrapper = styled.div`
     display: flex;
@@ -98,7 +99,7 @@ export interface userInfo{
 
 export default function Profile() {
     const [user, setUser] = useState<userInfo>();
-    const [avatar, setAvatar] = useState(user?.profileImage);
+    const [avatar, setAvatar] = useState<string | undefined>(undefined);
     const [inputText, setInputText] = useState(user?.username || "Anonymous");
     const [isEditing, setEditing] = useState(false);
     const [tweets, setTweets] = useState<ITweet[]>([]);
@@ -110,12 +111,6 @@ export default function Profile() {
     function updateAction() {
         setProfileUpdate((profileUpdate)=>!profileUpdate);
     }
-    useEffect(()=>{
-        const updatePfo = async()=> {
-            if(!user) return;
-        }
-        updatePfo();
-    }, [avatar]);
 
     useEffect(()=>{
         const fetchTweets = async() => {
@@ -141,16 +136,25 @@ export default function Profile() {
                 }
             }
         }
+
+        const getToken = async(token:string)=>{
+            dispatch({type: "SET_STRING", payload : token});
+        }
+        if(csrfToken === "null"){
+            CsrfToken().then(token => {
+                getToken(token);
+            });
+        }
         userInfo();
         fetchTweets();
-    }, [profileUpdate]); 
+    }, [profileUpdate, avatar]); 
 
     const onAvatarCahange = async (e:React.ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;
         if(!user) return;
         if(!files || files.length === 0) return;
-        if(files[0].size > 1 * 1024 * 1024) {
-            alert("Image file size should be less than 1Mb");
+        if(files[0].size > 2 * 1024 * 1024) {
+            alert("Image file size should be less than 2Mb");
             return;
         };
         try{
@@ -166,7 +170,7 @@ export default function Profile() {
             });
 
             if(response.status == 200) {
-                setAvatar(response.data?.profileImage); 
+                setAvatar(response.data?.profileImage + '?t=' + Date.now());
                 updateAction();
             }
         }catch(e){  
@@ -175,7 +179,8 @@ export default function Profile() {
                 alert("Please Log in");
                 navigate("/login");
             }
-            
+        }finally{
+            updateAction();
         }
     }
 
@@ -199,7 +204,7 @@ export default function Profile() {
         const ok = confirm("Are you sure you want to edit this profile?");
         if(!ok || !user) return;
         const special_pattern = /[`~!@#$%^&*|\\\'\";:\/?]/gi;
-        if(inputText!.search(/\s/g) > -1) {
+        if(inputText!.search(/\s/g) > -1 || inputText === "") {
             alert("There is a blank space in your name.");
         }else if(special_pattern.test(inputText!) == true){
             alert("You can't use special characters.");
@@ -223,9 +228,13 @@ export default function Profile() {
                 }
             }catch(e){  
                 console.log(e);
-                if(e instanceof AxiosError && e.status === 401) {
-                    alert("Please Log in");
-                    navigate("/login");
+                if(e instanceof AxiosError) {
+                    if(e.status === 401){
+                        alert("Please Log in");
+                        navigate("/login");
+                    }else if(e.status === 500){
+                        alert("You can't use");
+                    }
                 }
                 
             }
@@ -256,7 +265,6 @@ export default function Profile() {
                 alert("Please Log in");
                 navigate("/login");
             }
-            
         }
     }
     return (
