@@ -62,26 +62,29 @@ const SubmitBtn = styled.input`
 `;
 
 const StyledQuill = styled(ReactQuill)`
-    .ql-editor {
-        min-height: 120px;
-        font-size: 1.2em;
-        &:focus {
-        border: solid 1px;
-        border-color: #1d9bf0;
-        border-bottom-left-radius: 10px;
-        border-bottom-right-radius: 10px;
-        }
-    }
-    .ql-toolbar {
-        background-color: #b2e0ff;
-    }
     .ql-container {
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
     }
     .ql-toolbar {
+        background-color: #b2e0ff;
         border-top-right-radius: 10px;
         border-top-left-radius: 10px;
+    }
+    .ql-editor {
+        min-height: 120px;
+        font-size: 1.2em;
+        //강제 줄바꿈
+        white-space: normal;
+        word-break: break-all; 
+        overflow-wrap: break-word; 
+        word-wrap: break-word; 
+        &:focus {
+            border: solid 1px;
+            border-color: #1d9bf0;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
     }
 `;
 
@@ -130,6 +133,8 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             formData.append("tweet", tweet);
             if(file !== null){
                 formData.append("file", file);
+            }else{
+                formData.append("dummy", new Blob([""], { type: "text/plain" }), "dummy.txt");
             }
             const response = await axios.post("http://localhost:8080/api/board",formData, {
                 headers: {

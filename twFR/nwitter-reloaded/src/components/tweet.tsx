@@ -11,7 +11,6 @@ const Wrapper = styled.div`
     padding: 20px;
     border: 1px solid rgba(255,255,255,0.5);
     border-radius: 15px;
-
 `;
 
 const Column = styled.div`
@@ -33,21 +32,23 @@ const Payload = styled.div`
     overflow: hidden;
     min-height: 30px;
     max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 
     /* Payload 아래의 iframe에 적용 */
     iframe {
-    //position: absolute;
-    display: block;
-    max-width: 100%;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    height: auto;
-    border: 0;
+        //position: absolute;
+        display: block;
+        max-width: 100%;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        height: auto;
+        border: 0;
     }
 
     img {
-    max-width: 100%;
-    height: auto;
+        max-width: 100%;
+        height: auto;
     }
 `;
 

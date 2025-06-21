@@ -153,7 +153,7 @@ export default function Profile() {
         const { files } = e.target;
         if(!user) return;
         if(!files || files.length === 0) return;
-        if(files[0].size > 2 * 1024 * 1024) {
+        if(files[0].size > 1 * 1024 * 1024) {
             alert("Image file size should be less than 2Mb");
             return;
         };
