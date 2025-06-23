@@ -78,6 +78,7 @@ const BasicButton = styled.button`
     }
     &.reply_add_button{
         margin: 0 5px;
+        min-width: 50px;
     }
 `;
 
@@ -147,6 +148,12 @@ const StyledQuill = styled(ReactQuill)`
 
 const ReplyDiv = styled.div`
     display: flex;
+    height: 6vh;
+    &.reply_text_box{
+        display: flex;
+        flex-direction: row;
+        margin-top: 20px;
+    }
 `;
 
 
@@ -158,6 +165,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
     const dispatch = useDispatch();
     const user = window.sessionStorage.getItem("user");
     const userId = memberId.toString();
+    const loginState = useSelector((state:any)=>state.login);
     const replySet = useSelector((state:any)=>state.replyEdit === boardId);
     const csrfToken = useSelector((state:any)=>state.csrfToken);
     const bordSet = useSelector((state:any)=>state.boardEdit === boardId);
@@ -231,7 +239,10 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             alert("Please input message");
             return;
         }
-        console.log(boardId);
+        if(content.length > 200) return;
+        
+        
+        console.log(content.length);
     }
 
     const onEdit = () => {
@@ -285,11 +296,15 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             {user === userId ? <BasicButton onClick={onDelete}>Delete</BasicButton> : null}
             {user === userId ? bordSet ? <BasicButton className="cancelBtn" onClick={onEdit}>cancel</BasicButton> :<BasicButton onClick={onEdit}>Eidt</BasicButton> : null}
             {user === userId ? bordSet ? <BasicButton className="editSubmitBtn" onClick={onEditSubmit}>Edit Tweet</BasicButton> : null : null}
-            <BasicButton className="reply_button" onClick={onReply}>reply</BasicButton>
-            <ReplyDiv>
-                {replySet ? <TextArea value={content} onChange={onContent}></TextArea>: null}
-                {replySet ? <BasicButton className="reply_add_button" onClick={onReplySubmit}>add</BasicButton>: null}
-            </ReplyDiv>
+            {loginState ? <BasicButton className="reply_button" onClick={onReply}>reply</BasicButton>: null}
+            {replySet ? <p className="reply_text_box" style={{ fontSize: "0.6em", color: "#888", margin: "2px 0 0 2px" }}>
+                {content.length}/200</p>: null}
+            {loginState && replySet ? 
+                <ReplyDiv>
+                    {replySet ? <TextArea value={content} onChange={onContent} maxLength={200}></TextArea>
+                     : null}
+                    {replySet ? <BasicButton className="reply_add_button" onClick={onReplySubmit}>add</BasicButton>: null}
+                </ReplyDiv>: null}
         </Column>
     </Wrapper>
     )
