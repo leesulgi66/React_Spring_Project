@@ -37,7 +37,6 @@ const Payload = styled.div`
 
     /* Payload 아래의 iframe에 적용 */
     iframe {
-        //position: absolute;
         display: block;
         max-width: 100%;
         width: 100%;
@@ -100,6 +99,7 @@ const FileChangeInput = styled.input`
 `;
 
 const TextArea = styled.textarea`
+    position: relative;
     border: 2px solid white;
     padding: 5px;
     border-radius: 10px;
@@ -149,10 +149,14 @@ const StyledQuill = styled(ReactQuill)`
 const ReplyDiv = styled.div`
     display: flex;
     height: 6vh;
-    &.reply_text_box{
-        display: flex;
-        flex-direction: row;
-        margin-top: 20px;
+    position: relative;
+
+    .reply_text_length{
+    position: absolute;
+    bottom: 10px;
+    right: 70px;
+    font-size: 0.6em;
+    color: #888;
     }
 `;
 
@@ -240,7 +244,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             return;
         }
         if(content.length > 200) return;
-        
+
         
         console.log(content.length);
     }
@@ -297,13 +301,11 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             {user === userId ? bordSet ? <BasicButton className="cancelBtn" onClick={onEdit}>cancel</BasicButton> :<BasicButton onClick={onEdit}>Eidt</BasicButton> : null}
             {user === userId ? bordSet ? <BasicButton className="editSubmitBtn" onClick={onEditSubmit}>Edit Tweet</BasicButton> : null : null}
             {loginState ? <BasicButton className="reply_button" onClick={onReply}>reply</BasicButton>: null}
-            {replySet ? <p className="reply_text_box" style={{ fontSize: "0.6em", color: "#888", margin: "2px 0 0 2px" }}>
-                {content.length}/200</p>: null}
             {loginState && replySet ? 
                 <ReplyDiv>
-                    {replySet ? <TextArea value={content} onChange={onContent} maxLength={200}></TextArea>
-                     : null}
+                    {replySet ? <TextArea className="reply_text_box" value={content} onChange={onContent} maxLength={200}></TextArea>: null}
                     {replySet ? <BasicButton className="reply_add_button" onClick={onReplySubmit}>add</BasicButton>: null}
+                    <div>{replySet ? <p className="reply_text_length">{content.length}/200</p> : null}</div>
                 </ReplyDiv>: null}
         </Column>
     </Wrapper>
