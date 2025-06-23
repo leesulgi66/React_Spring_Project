@@ -34,6 +34,7 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
         try{
         const response = await axios.get("http://localhost:8080/api/board",{withCredentials : true});
         setTweets(response.data.content);
+        console.log(response.data)
         }catch(e){
             if(e instanceof AxiosError) {
                 console.log(e.message);
@@ -51,7 +52,7 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
         
     useEffect(() => {
         fetchTweets();
-        if(csrfToken === "null"){
+        if(csrfToken === null){
             CsrfToken().then(token => {
                 getToken(token);
             });

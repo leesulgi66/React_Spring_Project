@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { ITweet } from "./timeline";
 import { useEffect, useRef, useState } from "react";
 import axios, { AxiosError } from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css'
 import DOMPurify from 'dompurify';
@@ -52,7 +52,7 @@ const Payload = styled.div`
     }
 `;
 
-const DeleteButton = styled.button`
+const BasicButton = styled.button`
     background-color: dodgerblue;
     margin-right: 0.5%;
     color: white;
@@ -71,6 +71,13 @@ const DeleteButton = styled.button`
         background-color: dodgerblue;
         color: white;
         float: right;
+    }
+    &.reply_button{
+        background-color: white;
+        color: dodgerblue;
+    }
+    &.reply_add_button{
+        margin: 0 5px;
     }
 `;
 
@@ -93,16 +100,16 @@ const FileChangeInput = styled.input`
 
 const TextArea = styled.textarea`
     border: 2px solid white;
-    padding: 20px;
-    border-radius: 20px;
-    font-size: 16px;
+    padding: 5px;
+    border-radius: 10px;
+    font-size: 14px;
     color: white;
     background-color: black;
     width: 100%;
     resize: none;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     &::placeholder {
-        font-size: 16px;
+        font-size: 14px;
     }
     &:focus {
         outline: none;
@@ -138,16 +145,22 @@ const StyledQuill = styled(ReactQuill)`
     }
 `;
 
+const ReplyDiv = styled.div`
+    display: flex;
+`;
+
 
 export default function Tweet({memberName, photo, tweet, boardId, memberId, photoKey,onTweetPosted}:ITweet) {
-    const [isLoading, setLoading] = useState(false);
-    const [isEdit, setEdit] = useState(false);
+    const [content, setContent] = useState("");
     const [changeTweet, setChangeTweet] = useState(tweet);
     const [viewPhoto, setViewPhoto] = useState(photo);
     const [file, setFile] = useState<File|null>(null);
+    const dispatch = useDispatch();
     const user = window.sessionStorage.getItem("user");
     const userId = memberId.toString();
+    const replySet = useSelector((state:any)=>state.replyEdit === boardId);
     const csrfToken = useSelector((state:any)=>state.csrfToken);
+    const bordSet = useSelector((state:any)=>state.boardEdit === boardId);
 
     const onDelete = async() => {
         const ok = confirm("Are you sure you want to delete this tweet?");
@@ -161,31 +174,29 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             });
 
             if(response.status == 200) {
-                setLoading(false);
                 onTweetPosted();
             }
-            setEdit(false);
+            dispatch({type: "BOARD_EDIT", payload: null});
         } catch (e) {
             console.log(e);
-            setEdit(false);
+            dispatch({type: "BOARD_EDIT", payload: null});
         } finally {
-            setEdit(false);
+            dispatch({type: "BOARD_EDIT", payload: null});
         }
     }
 
     const onEditSubmit =async() => {
         const ok = confirm("Are you sure you want to edit this tweet?");
         if(!ok || false) return;
+        if(user === null) return
+        const replaced = changeTweet.replace(/<(?!img\b|iframe\b)[^>]+>/gi, '') 
+                        .replace(/&nbsp;/g, '') 
+                        .trim();
+        if(replaced === "") {
+            alert("Please input it")
+            return;
+        };
         try{
-            setLoading(true);
-            if(user === null) return
-            const replaced = changeTweet.replace(/<(?!img\b|iframe\b)[^>]+>/gi, '') 
-                         .replace(/&nbsp;/g, '') 
-                         .trim();
-            if(replaced === "") {
-                alert("Please input it")
-                return;
-            };
             const formData = new FormData();
             formData.append("boardId", boardId.toString());
             formData.append("user", user);
@@ -201,7 +212,6 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             });
 
             if(response.status == 200) {
-                setLoading(false);
                 onTweetPosted();
             }
             setFile(null);
@@ -210,29 +220,37 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             if(e instanceof AxiosError && e.status === 401) {
                 alert("Please Log in");
             }
-            setLoading(false);
         }finally {
-            setLoading(false);
             setFile(null);
-            setEdit(false);
+            dispatch({type: "BOARD_EDIT", payload: null});
         }
     }
+
+    const onReplySubmit = async() => {
+        if(content.trim() === ""){
+            alert("Please input message");
+            return;
+        }
+        console.log(boardId);
+    }
+
     const onEdit = () => {
         if(user !== userId) return;
-        setEdit(!isEdit);
+        dispatch({type: "BOARD_EDIT", payload: boardId});
+        dispatch({type: "REPLY_EDIT", payload: null});
         setChangeTweet(tweet);
         setFile(null);
     }
-    const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { files } = e.target;
-        if (!files || files.length === 0) return;
-    
-        if (files[0].size > 1 * 1024 * 1024) {
-            alert("Image file size should be less than 1Mb");
-            return;
-        }
-        setFile(files[0]);
-    };
+
+    const onReply = () => {
+        dispatch({type: "REPLY_EDIT", payload: boardId});
+        dispatch({type: "BOARD_EDIT", payload: null});
+    }
+
+    const onContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setContent(e.target.value);
+    }
+
     useEffect(() => {
         if (!file) return;
         console.log("file useeffect")
@@ -262,11 +280,16 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
     return (<Wrapper>
         <Column>
             <Username>{memberName}</Username>
-            {isEdit ? <StyledQuill value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
+            {bordSet ? <StyledQuill value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
             <Payload dangerouslySetInnerHTML={{ __html: cleanHtml }}></Payload>}
-            {user === userId ? <DeleteButton onClick={onDelete}>Delete</DeleteButton> : null}
-            {user === userId ? isEdit ? <DeleteButton className="cancelBtn" onClick={onEdit}>cancel</DeleteButton> :<DeleteButton onClick={onEdit}>Eidt</DeleteButton> : null}
-            {user === userId ? isEdit ? <DeleteButton className="editSubmitBtn" onClick={onEditSubmit}>Edit Tweet</DeleteButton> : null : null}
+            {user === userId ? <BasicButton onClick={onDelete}>Delete</BasicButton> : null}
+            {user === userId ? bordSet ? <BasicButton className="cancelBtn" onClick={onEdit}>cancel</BasicButton> :<BasicButton onClick={onEdit}>Eidt</BasicButton> : null}
+            {user === userId ? bordSet ? <BasicButton className="editSubmitBtn" onClick={onEditSubmit}>Edit Tweet</BasicButton> : null : null}
+            <BasicButton className="reply_button" onClick={onReply}>reply</BasicButton>
+            <ReplyDiv>
+                {replySet ? <TextArea value={content} onChange={onContent}></TextArea>: null}
+                {replySet ? <BasicButton className="reply_add_button" onClick={onReplySubmit}>add</BasicButton>: null}
+            </ReplyDiv>
         </Column>
     </Wrapper>
     )

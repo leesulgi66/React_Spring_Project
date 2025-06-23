@@ -144,7 +144,7 @@ export default function Profile() {
         const getToken = async(token:string)=>{
             dispatch({type: "SET_STRING", payload : token});
         }
-        if(csrfToken === "null"){
+        if(csrfToken === null){
             CsrfToken().then(token => {
                 getToken(token);
             });
