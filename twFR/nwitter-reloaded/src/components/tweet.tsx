@@ -111,12 +111,29 @@ const TextArea = styled.textarea`
 `;
 
 const StyledQuill = styled(ReactQuill)`
-    .ql-editor {
-    min-height: 80px;
-    font-size: 1.2em;
-    }   
+     .ql-container {
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
     .ql-toolbar {
-    background-color: #b2e0ff;
+        background-color: #b2e0ff;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+    }
+    .ql-editor {
+        min-height: 120px;
+        font-size: 1.2em;
+        //강제 줄바꿈
+        white-space: normal;
+        word-break: break-all; 
+        overflow-wrap: break-word; 
+        word-wrap: break-word; 
+        &:focus {
+            border: solid 1px;
+            border-color: #1d9bf0;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
     }
 `;
 
@@ -154,15 +171,20 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             setEdit(false);
         }
     }
-    const onChange = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
-        setChangeTweet(e.target.value);
-    }
+
     const onEditSubmit =async() => {
         const ok = confirm("Are you sure you want to edit this tweet?");
         if(!ok || false) return;
         try{
             setLoading(true);
             if(user === null) return
+            const replaced = changeTweet.replace(/<(.|\n)*?>/g, '') // HTML 제거
+                         .replace(/&nbsp;/g, '') // nbsp 제거
+                         .trim();
+            if(replaced === "") {
+                alert("Please input it")
+                return;
+            };
             const formData = new FormData();
             formData.append("boardId", boardId.toString());
             formData.append("user", user);

@@ -124,7 +124,12 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     }
     const onSubmit = async(e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if(isLoading || tweet === "") return;
+        const replaced = tweet.replace(/<(.|\n)*?>/g, '') // HTML 제거
+                         .replace(/&nbsp;/g, '') // nbsp 제거
+                         .trim();
+        if(isLoading || replaced === "") {
+            alert("Please input it")
+            return};
         try{
             setLoading(true);
             if(user === null) return

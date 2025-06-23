@@ -38,6 +38,8 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
             if(e instanceof AxiosError) {
                 console.log(e.message);
                 alert("Server is down");
+                window.sessionStorage.removeItem("user");
+                dispatch({type: "SET_LOGIN", payload: false});
                 //navigate("/login");
             }
         }

@@ -41,7 +41,11 @@ const Tweets = styled.div`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 80%;
+    width: 90%;
+    white-space: normal;
+    word-break: break-all; 
+    overflow-wrap: break-word; 
+    word-wrap: break-word;
 `;
 
 const Name = styled.div`
