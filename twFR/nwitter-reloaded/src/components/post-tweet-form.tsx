@@ -124,7 +124,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     }
     const onSubmit = async(e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const replaced = tweet.replace(/<(.|\n)*?>/g, '') // HTML 제거
+        const replaced = tweet.replace(/<(?!img\b|iframe\b)[^>]+>/gi, '') // HTML 제거
                          .replace(/&nbsp;/g, '') // nbsp 제거
                          .trim();
         if(isLoading || replaced === "") {

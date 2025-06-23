@@ -111,7 +111,8 @@ const TextArea = styled.textarea`
 `;
 
 const StyledQuill = styled(ReactQuill)`
-     .ql-container {
+    margin: 5px 0;
+    .ql-container {
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
     }
@@ -178,8 +179,8 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
         try{
             setLoading(true);
             if(user === null) return
-            const replaced = changeTweet.replace(/<(.|\n)*?>/g, '') // HTML 제거
-                         .replace(/&nbsp;/g, '') // nbsp 제거
+            const replaced = changeTweet.replace(/<(?!img\b|iframe\b)[^>]+>/gi, '') 
+                         .replace(/&nbsp;/g, '') 
                          .trim();
             if(replaced === "") {
                 alert("Please input it")
