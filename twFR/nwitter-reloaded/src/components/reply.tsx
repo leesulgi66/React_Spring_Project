@@ -22,9 +22,14 @@ const Column = styled.div`
     }
 `;
 
+const Username = styled.p<{isMyself:boolean}>`
+    color:${props => props.isMyself ? '#ffffc1' : 'white'};
+`;
+
 export default function Reply({ id, boardId , memberId, insertTime, updateTime, memberName, content, onTweetPosted }:ReplyList) {
     const [myContent, setMyContent] = useState(content);
     const user = window.sessionStorage.getItem("user");
+    const isMyself = user === memberId.toString();
     const userId = memberId.toString();
 
     const onDelete = async() => {
@@ -48,7 +53,7 @@ export default function Reply({ id, boardId , memberId, insertTime, updateTime, 
     return(
         <Wrapper>
             <Column>
-                <p>└</p>{memberName} : {myContent}
+                └<Username isMyself={isMyself}>{memberName}</Username> : <p>{myContent}</p>
                 {user === userId ? <p onClick={onDelete} className="right_del">✖</p> : null}
             </Column>
         </Wrapper>

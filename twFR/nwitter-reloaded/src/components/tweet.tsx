@@ -9,9 +9,9 @@ import 'react-quill/dist/quill.snow.css'
 import DOMPurify from 'dompurify';
 import Reply from "./reply";
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{isMyself:boolean}>`
     padding: 20px;
-    border: 1px solid rgba(255,255,255,0.5);
+    border: 1px solid ${props => props.isMyself ? '#b2e0ff' : 'rgba(255,255,255,0.5)'};
     border-radius: 15px;
 `;
 
@@ -176,6 +176,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
     const replySet = useSelector((state:any)=>state.replyEdit === boardId);
     const csrfToken = useSelector((state:any)=>state.csrfToken);
     const bordSet = useSelector((state:any)=>state.boardEdit === boardId);
+    const isMyself = user === userId;
 
     const onDelete = async() => {
         const ok = confirm("Are you sure you want to delete this tweet?");
@@ -252,7 +253,6 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
             formData.append("boardId", boardId.toString());
             formData.append("content", content);
             const response = await axiosConfig.post("/api/reply", formData);
-            console.log(response);
             if(response.status === 200){
                 dispatch({type: "REPLY_EDIT", payload: null});
                 dispatch({type: "BOARD_EDIT", payload: null});
@@ -302,7 +302,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
         ALLOWED_URI_REGEXP: /^https?:\/\/(www\.youtube\.com|youtube\.com|player\.vimeo\.com)\//,
     });
 
-    return (<Wrapper>
+    return (<Wrapper isMyself={isMyself}>
         <Column>
             <Username>{memberName}</Username>
             {bordSet ? <StyledQuill value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
