@@ -321,7 +321,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
             {replyList.length > 0 ? 
                 <div style={{marginTop:"5px", borderTop:"1px solid gray"}}>
                     <h4 style={{marginTop:"5px"}}>Re:</h4>
-                    {replyList.map(reply => <Reply key={reply.id} {...reply} />)}
+                    {replyList.map(reply => <Reply key={reply.id} {...reply} onTweetPosted={onTweetPosted}/>)}
                 </div>
             :null}
             {/* ========================= */}

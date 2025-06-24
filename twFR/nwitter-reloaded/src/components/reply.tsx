@@ -22,7 +22,7 @@ const Column = styled.div`
     }
 `;
 
-export default function Reply({ id, boardId , memberId, insertTime, updateTime, memberName, content }:ReplyList) {
+export default function Reply({ id, boardId , memberId, insertTime, updateTime, memberName, content, onTweetPosted }:ReplyList) {
     const [myContent, setMyContent] = useState(content);
     const user = window.sessionStorage.getItem("user");
     const userId = memberId.toString();
@@ -33,7 +33,7 @@ export default function Reply({ id, boardId , memberId, insertTime, updateTime, 
         try{
             const response = await axiosConfig.delete("/api/reply", {data:id});
             if(response.status === 200) {
-
+                onTweetPosted();
             }
         }catch(e){
             if(e === AxiosError) {

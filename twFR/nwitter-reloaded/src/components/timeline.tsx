@@ -27,6 +27,7 @@ export interface ReplyList {
     updateTime: number;
     memberName: string;
     content: string;
+    onTweetPosted: () => void;
 }
 
 const Wrapper = styled.div`
