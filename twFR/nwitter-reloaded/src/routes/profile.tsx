@@ -129,6 +129,7 @@ export default function Profile() {
                 }
             }
         };
+
         const userInfo = async() => {
             try{
                 const response:{data:userInfo} = await axios.get("http://localhost:8080/api/user",{withCredentials : true});
@@ -240,7 +241,6 @@ export default function Profile() {
                         alert("You can't use");
                     }
                 }
-                
             }
         }
     }
@@ -261,6 +261,7 @@ export default function Profile() {
             if(response.status == 200) {
                 window.sessionStorage.removeItem("user");
                 dispatch({type: "SET_LOGIN", payload: false});
+                console.log("del user");
                 navigate("/");
             }
         }catch(e){  

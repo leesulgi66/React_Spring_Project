@@ -64,13 +64,10 @@ export default function Layout() {
     useEffect(()=>{
         setUser(window.sessionStorage.getItem("user"));
     },[]);
+
     useEffect(() => {
         dispatch({ type: "SET_LOGIN", payload: user !== null });
     }, [user, dispatch]);
-
-    if(user !== null) {
-        dispatch({type: "SET_LOGIN", payload: true});
-    }
 
     const onLogIn = ()=> {
         navigate("/login")
