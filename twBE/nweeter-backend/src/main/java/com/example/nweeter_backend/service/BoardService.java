@@ -1,10 +1,15 @@
 package com.example.nweeter_backend.service;
 
+import com.example.nweeter_backend.auth.PrincipalDetails;
 import com.example.nweeter_backend.dto.BoardRequestDto;
 import com.example.nweeter_backend.dto.BoardResponseDto;
+import com.example.nweeter_backend.dto.ReplyRequestDto;
+import com.example.nweeter_backend.dto.ReplyResponseDto;
 import com.example.nweeter_backend.modle.Board;
 import com.example.nweeter_backend.modle.Member;
+import com.example.nweeter_backend.modle.Reply;
 import com.example.nweeter_backend.repository.BoardRepository;
+import com.example.nweeter_backend.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,12 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BoardService {
 
     final private BoardRepository boardRepository;
+    final private ReplyRepository replyRepository;
 
     @Transactional
     public void save(BoardRequestDto dto, Member member) throws IOException {
@@ -57,6 +64,22 @@ public class BoardService {
         boardRepository.deleteById(id);
     }
 
+    @Transactional
+    public void replySave(ReplyRequestDto dto, PrincipalDetails principal) {
+        Board board = boardRepository.findById(dto.getBoardId()).orElseThrow(()-> new IllegalArgumentException("can't find board"));
+        Member member = principal.getMember();
+        Reply reply = new Reply();
+        reply.setBoard(board);
+        reply.setMember(member);
+        reply.setContent(dto.getContent());
+        replyRepository.save(reply);
+    }
+
+    @Transactional
+    public void replyDelete(Long id, PrincipalDetails principal) {
+        replyRepository.deleteById(id);
+    }
+
     private Page<BoardResponseDto> boardResponseDto(Page<Board> boards) {
         return boards.map(p ->
                 BoardResponseDto.builder()
@@ -66,7 +89,18 @@ public class BoardService {
                         .memberName(p.getMember().getUsername())
                         .insertTime(p.getInsertTime())
                         .updateTime(p.getUpdateTime())
+                        .replies(
+                                p.getReplies().stream()
+                                        .map(r -> ReplyResponseDto.builder()
+                                                .id(r.getId())
+                                                .boardId(r.getBoard().getId())
+                                                .memberId(r.getMember().getId())
+                                                .insertTime(r.getInsertTime())
+                                                .updateTime(r.getUpdateTime())
+                                                .memberName(r.getMember().getUsername())
+                                                .content(r.getContent())
+                                                .build()).collect(Collectors.toList())
+                        )
                         .build());
     }
-
 }

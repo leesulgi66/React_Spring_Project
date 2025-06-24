@@ -3,6 +3,7 @@ package com.example.nweeter_backend.controller;
 import com.example.nweeter_backend.auth.PrincipalDetails;
 import com.example.nweeter_backend.dto.BoardRequestDto;
 import com.example.nweeter_backend.dto.BoardResponseDto;
+import com.example.nweeter_backend.dto.ReplyRequestDto;
 import com.example.nweeter_backend.service.BoardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class BoardApiController {
         int byteSize = dto.getTweet().getBytes(StandardCharsets.UTF_8).length;
         System.out.println("tweet size : "+byteSize);
         boardService.save(dto, principal.getMember());
-        return new ResponseEntity<>("save ok", HttpStatus.OK);
+        return new ResponseEntity<>("board save ok", HttpStatus.OK);
     }
 
     @GetMapping("/board")
@@ -56,7 +57,7 @@ public class BoardApiController {
     public ResponseEntity<String> boardDelete(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails principal) throws IOException {
         log.info("board delete call");
         boardService.delete(id);
-        return new ResponseEntity<>("delete ok", HttpStatus.OK);
+        return new ResponseEntity<>("board delete ok", HttpStatus.OK);
     }
 
     @PutMapping("/board")
@@ -66,5 +67,20 @@ public class BoardApiController {
         dto.setId(num);
         boardService.edit(dto, principal.getMember());
         return new ResponseEntity<>("edit ok", HttpStatus.OK);
+    }
+
+    @PostMapping("/reply")
+    public ResponseEntity<String> replySave(ReplyRequestDto dto, @AuthenticationPrincipal PrincipalDetails principal) {
+        log.info("reply save call");
+        boardService.replySave(dto ,principal);
+        return new ResponseEntity<>("reply save ok", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/reply")
+    public ResponseEntity<String> replyDelete(@RequestBody String id, @AuthenticationPrincipal PrincipalDetails principal) {
+        log.info("reply delete call");
+        Long numId = Long.parseLong(id);
+        boardService.replyDelete(numId , principal);
+        return new ResponseEntity<>("reply delete ok", HttpStatus.OK);
     }
 }
