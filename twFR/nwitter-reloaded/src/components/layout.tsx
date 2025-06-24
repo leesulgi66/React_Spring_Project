@@ -63,7 +63,10 @@ export default function Layout() {
 
     useEffect(()=>{
         setUser(window.sessionStorage.getItem("user"));
-    },[user]);
+    },[]);
+    useEffect(() => {
+        dispatch({ type: "SET_LOGIN", payload: user !== null });
+    }, [user, dispatch]);
 
     if(user !== null) {
         dispatch({type: "SET_LOGIN", payload: true});
@@ -84,6 +87,7 @@ export default function Layout() {
                     },
                 });
                 if(response.status === 200){
+                    setUser(null);
                     window.sessionStorage.removeItem("user");
                     dispatch({type: "SET_LOGIN", payload: false});
                     navigate("/");
@@ -92,6 +96,7 @@ export default function Layout() {
                 console.log(e);
                 //navigate("/login");
             }finally {
+                setUser(null);
                 window.sessionStorage.removeItem("user");
                 dispatch({type: "SET_LOGIN", payload: false});
                 document.cookie = "JSESSIONID" + '=; expires=Thu, 01 Jan 1999 00:00:10 GMT;';
