@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css'
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components"
 
@@ -96,13 +96,14 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     const loginState = useSelector((state:any) => state.login);
     const csrfToken = useSelector((state:any)=>state.csrfToken);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const onChange = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
         setTweet(e.target.value);
     }
     const onClick = () => {
         if(loginState === false) {
-            const ok = confirm("로그인이 필요합니다.");
+            const ok = confirm("Please login.");
             if(!ok) {
                 (document.activeElement as HTMLElement).blur() 
                 navigate("/");
@@ -111,17 +112,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             }
         }
     }
-    const onFileChange = (e: React.ChangeEvent<HTMLInputElement>)=> {
-        const{files} = e.target;
-        if(files && files.length === 1) {
-            if(files[0].size < 1*1024*1024){
-                setFile(files[0]);
-                console.log("file on");
-            }else {
-                alert("image file size should be less than 1Mb");
-            }
-        }
-    }
+
     const onSubmit = async(e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const replaced = tweet.replace(/<(?!img\b|iframe\b)[^>]+>/gi, '') // HTML 제거
@@ -132,7 +123,10 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             return};
         try{
             setLoading(true);
-            if(user === null) return
+            if(user === null) {
+                alert("Please login");
+                return
+            }
             const formData = new FormData();
             formData.append("user", user);
             formData.append("tweet", tweet);
@@ -158,6 +152,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             console.log(e);
             if(e instanceof AxiosError && e.status === 401) {
                 alert("Please Log in");
+                dispatch({type: "SET_LOGIN", payload: false});
                 navigate("/login");
             }
             

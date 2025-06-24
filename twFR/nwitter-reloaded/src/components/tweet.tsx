@@ -1,11 +1,13 @@
 import styled from "styled-components";
-import { ITweet } from "./timeline";
-import { useEffect, useRef, useState } from "react";
+import { ITweet, ReplyList } from "./timeline";
+import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
+import axiosConfig from "../api/axios"
 import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css'
 import DOMPurify from 'dompurify';
+import Reply from "./reply";
 
 const Wrapper = styled.div`
     padding: 20px;
@@ -161,9 +163,10 @@ const ReplyDiv = styled.div`
 `;
 
 
-export default function Tweet({memberName, photo, tweet, boardId, memberId, photoKey,onTweetPosted}:ITweet) {
+export default function Tweet({memberName, photo, tweet, boardId, memberId, replies ,onTweetPosted}:ITweet) {
     const [content, setContent] = useState("");
     const [changeTweet, setChangeTweet] = useState(tweet);
+    const [replyList, setReplyList] = useState<ReplyList[]>(replies); 
     const [viewPhoto, setViewPhoto] = useState(photo);
     const [file, setFile] = useState<File|null>(null);
     const dispatch = useDispatch();
@@ -244,9 +247,23 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
             return;
         }
         if(content.length > 200) return;
-
-        
-        console.log(content.length);
+        try{
+            const formData = new FormData();
+            formData.append("boardId", boardId.toString());
+            formData.append("content", content);
+            const response = await axiosConfig.post("/api/reply", formData);
+            console.log(response);
+            if(response.status === 200){
+                dispatch({type: "REPLY_EDIT", payload: null});
+                dispatch({type: "BOARD_EDIT", payload: null});
+                setContent("");
+                onTweetPosted();
+            }
+        }catch(e){
+            if(e === AxiosError) {
+                console.log(e);
+            }
+        }
     }
 
     const onEdit = () => {
@@ -267,15 +284,8 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
     }
 
     useEffect(() => {
-        if (!file) return;
-        console.log("file useeffect")
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            const filelocation = reader.result as string;
-            setViewPhoto(filelocation);
-        };
-    }, [file]);
+        setReplyList(replies);
+    }, [replies]);
 
     const modules = {
         toolbar: [
@@ -307,6 +317,14 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, phot
                     {replySet ? <BasicButton className="reply_add_button" onClick={onReplySubmit}>add</BasicButton>: null}
                     <div>{replySet ? <p className="reply_text_length">{content.length}/200</p> : null}</div>
                 </ReplyDiv>: null}
+            {/* === 여기서 replyList 표시 === */}
+            {replyList.length > 0 ? 
+                <div style={{marginTop:"5px", borderTop:"1px solid gray"}}>
+                    <h4 style={{marginTop:"5px"}}>Re:</h4>
+                    {replyList.map(reply => <Reply key={reply.id} {...reply} />)}
+                </div>
+            :null}
+            {/* ========================= */}
         </Column>
     </Wrapper>
     )

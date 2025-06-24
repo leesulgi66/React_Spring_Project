@@ -1,11 +1,13 @@
 import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export default function ProtectedRoute({children} : {children:React.ReactNode}) {
     const navigate = useNavigate();
     const [user, setUser] = useState(window.sessionStorage.getItem("user"));
     const [isLoading, setLoading] = useState(true);
+    const dispatch = useDispatch();
     const loginCheck = async ()=> {
         if(!user) {
             navigate("/login");
@@ -21,6 +23,7 @@ export default function ProtectedRoute({children} : {children:React.ReactNode}) 
             if(e instanceof AxiosError){
                 console.log(e.message);
                 window.sessionStorage.removeItem("user");
+                dispatch({type: "SET_LOGIN", payload: false});
                 navigate("/login");
                 return;
             }

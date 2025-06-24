@@ -15,7 +15,18 @@ export interface ITweet {
     memberName: string;
     insertTime: number;
     updateTime: number;
+    replies: [];
     onTweetPosted: () => void;
+}
+
+export interface ReplyList {
+    id : number;
+    boardId : number;
+    memberId: number;
+    insertTime: number;
+    updateTime: number;
+    memberName: string;
+    content: string;
 }
 
 const Wrapper = styled.div`
@@ -30,11 +41,11 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
     const navigate = useNavigate();
     const csrfToken = useSelector((state:any) => state.csrfToken);
     const dispatch = useDispatch();
+
     const fetchTweets = async() => {
         try{
         const response = await axios.get("http://localhost:8080/api/board",{withCredentials : true});
         setTweets(response.data.content);
-        console.log(response.data)
         }catch(e){
             if(e instanceof AxiosError) {
                 console.log(e.message);
@@ -55,6 +66,9 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
         if(csrfToken === null){
             CsrfToken().then(token => {
                 getToken(token);
+            }).catch(error => {
+                console.log(error);
+                dispatch({type: "SET_LOGIN", payload: false});
             });
         }
     }, [tweetsUpdated]); 

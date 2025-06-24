@@ -1,7 +1,8 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
 const Wrapper = styled.div`
     display: grid;
@@ -54,11 +55,16 @@ const MenuItem = styled.div`
 `;
 
 export default function Layout() {
-    const user = window.sessionStorage.getItem("user");
+    const [user, setUser] = useState(window.sessionStorage.getItem("user"));
     const navigate = useNavigate();
     const csrfToken = useSelector((state:any) => state.csrfToken);
     const loginState = useSelector((state:any) => state.login);
     const dispatch = useDispatch();
+
+    useEffect(()=>{
+        setUser(window.sessionStorage.getItem("user"));
+    },[user]);
+
     if(user !== null) {
         dispatch({type: "SET_LOGIN", payload: true});
     }
