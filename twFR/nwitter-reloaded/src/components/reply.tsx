@@ -18,7 +18,10 @@ const Column = styled.div`
         max-height: 15px;
     }
     p {
-        margin: 2px 2px;
+        margin: 2px 0;
+    }
+    #comma{
+        margin: 0 2px;
     }
 `;
 
@@ -53,7 +56,7 @@ export default function Reply({ id, boardId , memberId, insertTime, updateTime, 
     return(
         <Wrapper>
             <Column>
-                └<Username isMyself={isMyself}>{memberName}</Username> : <p>{myContent}</p>
+                └{isMyself ? <p>💙</p>:null}<Username isMyself={isMyself}>{memberName}</Username><p id="comma">:</p><p>{myContent}</p>
                 {user === userId ? <p onClick={onDelete} className="right_del">✖</p> : null}
             </Column>
         </Wrapper>

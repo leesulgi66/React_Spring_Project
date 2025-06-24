@@ -311,12 +311,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
             {user === userId ? bordSet ? <BasicButton className="cancelBtn" onClick={onEdit}>cancel</BasicButton> :<BasicButton onClick={onEdit}>Eidt</BasicButton> : null}
             {user === userId ? bordSet ? <BasicButton className="editSubmitBtn" onClick={onEditSubmit}>Edit Tweet</BasicButton> : null : null}
             {loginState ? <BasicButton className="reply_button" onClick={onReply}>reply</BasicButton>: null}
-            {loginState && replySet ? 
-                <ReplyDiv>
-                    {replySet ? <TextArea className="reply_text_box" value={content} onChange={onContent} maxLength={200}></TextArea>: null}
-                    {replySet ? <BasicButton className="reply_add_button" onClick={onReplySubmit}>add</BasicButton>: null}
-                    <div>{replySet ? <p className="reply_text_length">{content.length}/200</p> : null}</div>
-                </ReplyDiv>: null}
+            
             {/* === 여기서 replyList 표시 === */}
             {replyList.length > 0 ? 
                 <div style={{marginTop:"5px", borderTop:"1px solid gray"}}>
@@ -325,6 +320,13 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
                 </div>
             :null}
             {/* ========================= */}
+
+            {loginState && replySet ? 
+                <ReplyDiv>
+                    {replySet ? <TextArea className="reply_text_box" value={content} onChange={onContent} maxLength={200}></TextArea>: null}
+                    {replySet ? <BasicButton className="reply_add_button" onClick={onReplySubmit}>add</BasicButton>: null}
+                    <div>{replySet ? <p className="reply_text_length">{content.length}/200</p> : null}</div>
+                </ReplyDiv>: null}
         </Column>
     </Wrapper>
     )
