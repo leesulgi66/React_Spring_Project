@@ -83,23 +83,6 @@ const BasicButton = styled.button`
     }
 `;
 
-const FileChangeButton = styled.label`
-    /* display: inline-block;
-    margin: 3% 20%;
-    text-align: center;
-    width: 35%;
-    padding: 2px 7px;
-    border-radius: 5px;
-    border: 1px solid white;
-    text-transform: uppercase;
-    font-size: 11px;
-    cursor: pointer; */
-`;
-
-const FileChangeInput = styled.input`
-    display: none;
-`;
-
 const TextArea = styled.textarea`
     position: relative;
     border: 2px solid white;
@@ -110,7 +93,6 @@ const TextArea = styled.textarea`
     background-color: black;
     width: 100%;
     resize: none;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     &::placeholder {
         font-size: 14px;
     }

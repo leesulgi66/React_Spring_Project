@@ -13,40 +13,6 @@ const Form = styled.form`
     margin-bottom: 1px;
 `;
 
-const TextArea = styled.textarea`
-    border: 2px solid white;
-    padding: 20px;
-    border-radius: 20px;
-    font-size: 16px;
-    color: white;
-    background-color: black;
-    width: 100%;
-    resize: none;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    &::placeholder {
-        font-size: 16px;
-    }
-    &:focus {
-        outline: none;
-        border-color: #1d9bf0;
-    }
-`;
-
-const AttachFileButton = styled.label`
-    padding: 10px 0px;
-    color: #1d9bf0;
-    text-align: center;
-    border-radius: 20px;
-    border: 1px solid #1d9bf0;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-`;
-
-const AttachFileInput = styled.input`
-    display: none;
-`;
-
 const SubmitBtn = styled.input`
     background-color: #1d9bf0;
     color: white;
@@ -72,6 +38,7 @@ const StyledQuill = styled(ReactQuill)`
         border-top-left-radius: 10px;
     }
     .ql-editor {
+        font-family: 'CookieRun', sans-serif;
         min-height: 120px;
         font-size: 1.2em;
         //강제 줄바꿈

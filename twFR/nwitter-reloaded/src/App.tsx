@@ -43,14 +43,28 @@ const router = createBrowserRouter([
 
 const GlobalStyles = createGlobalStyle`
   ${reset};
+  @font-face {
+    font-family: 'CookieRun';
+    src: url('/fonts/CookieRun-Regular.otf') format('opentype');
+    font-weight: thin;
+    font-style: normal;
+  }
   * {
     box-sizing: border-box;
   }
   body {
     background-color: #000716;
     color: white;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: 'CookieRun', sans-serif;
 
+  }
+  textarea,
+  select {
+    font-family: 'CookieRun', sans-serif;
+  }
+  input,
+  button {
+    font-family: 'CookieRun', sans-serif;
   }
   ::-webkit-scrollbar{
     display: none;
