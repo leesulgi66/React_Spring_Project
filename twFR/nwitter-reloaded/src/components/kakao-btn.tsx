@@ -25,7 +25,7 @@ export default function KakaoButton() {
     const navigate = useNavigate();
     const onClick = async () => {
         try {
-            
+            console.log("kakao");
             navigate("/");
         } catch (error) {
             console.log(error);
