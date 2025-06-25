@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweet";
 import axios, { AxiosError } from "axios";
+import axiosConfig from "../api/axios"
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import CsrfToken from "../components/csrfTokenGet";
@@ -108,28 +109,43 @@ export default function Profile() {
     const [isEditing, setEditing] = useState(false);
     const [tweets, setTweets] = useState<ITweet[]>([]);
     const [profileUpdate, setProfileUpdate] = useState(false);
+    const [page, setPage] = useState<number>(0);
+    const [hasMore, setHasMore] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
     const csrfToken = useSelector((state:any)=>state.csrfToken);
     const dispatch = useDispatch();
+
+    const fetchTweets = async(page = 0) => {
+        try{
+        const response = await axiosConfig.get("/api/board/user",{
+            params: {
+                page: page
+            },
+            withCredentials: true
+        });
+        const newTweets = response.data.content;
+        setTweets(prev => 
+            page === 0 
+                ? newTweets // 처음 페이지
+                : [...prev, ...newTweets] // 기존 페이지 + 새 페이지
+        );
+        // 마지막 페이지인지 판단
+        setHasMore(!response.data.last);
+        }catch(e){
+            if(e instanceof AxiosError) {
+                console.log(e.message);
+                alert("Please Log in");
+                navigate("/login");
+            }
+        }
+    };
 
     function updateAction() {
         setProfileUpdate((profileUpdate)=>!profileUpdate);
     }
 
     useEffect(()=>{
-        const fetchTweets = async() => {
-            try{
-            const response = await axios.get("http://localhost:8080/api/board/user",{withCredentials : true});
-            setTweets(response.data.content);
-            }catch(e){
-                if(e instanceof AxiosError) {
-                    console.log(e.message);
-                    alert("Please Log in");
-                    navigate("/login");
-                }
-            }
-        };
-
         const userInfo = async() => {
             try{
                 const response:{data:userInfo} = await axios.get("http://localhost:8080/api/user",{withCredentials : true});
@@ -151,8 +167,27 @@ export default function Profile() {
             });
         }
         userInfo();
-        fetchTweets();
     }, [profileUpdate, avatar]); 
+
+    useEffect(() => { // 첫 로딩시 페이지 초기화
+        setPage(0);
+        setHasMore(true);
+    }, []);
+
+    useEffect(() => {
+        fetchTweets(page);
+    }, [page,profileUpdate]);
+    
+    useEffect(() => { // 스크롤 인식
+        const handleScroll = () => {
+            const {scrollTop, scrollHeight, clientHeight} = document.documentElement;
+            if (scrollTop + clientHeight >= scrollHeight - 100 && hasMore && !loading) {
+                setPage(prev => prev + 1); // 다음 페이지로
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [hasMore, loading]);
 
     const onAvatarCahange = async (e:React.ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;

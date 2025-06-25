@@ -103,7 +103,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     }
     const onClick = () => {
         if(loginState === false) {
-            const ok = confirm("Please login.");
+            const ok = confirm("You need to log in. Do you want to log in?");
             if(!ok) {
                 (document.activeElement as HTMLElement).blur() 
                 navigate("/");
