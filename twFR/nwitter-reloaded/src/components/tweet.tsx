@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ITweet, ReplyList } from "./timeline";
+import { ITweet, IReply } from "./timeline";
 import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
@@ -114,6 +114,7 @@ const StyledQuill = styled(ReactQuill)`
         border-top-left-radius: 10px;
     }
     .ql-editor {
+        font-family: 'CookieRun', sans-serif;
         min-height: 120px;
         font-size: 1.2em;
         //강제 줄바꿈
@@ -148,36 +149,27 @@ const ReplyDiv = styled.div`
 export default function Tweet({memberName, photo, tweet, boardId, memberId, replies ,onTweetPosted}:ITweet) {
     const [content, setContent] = useState("");
     const [changeTweet, setChangeTweet] = useState(tweet);
-    const [replyList, setReplyList] = useState<ReplyList[]>(replies); 
-    const [viewPhoto, setViewPhoto] = useState(photo);
+    const [replyList, setReplyList] = useState<IReply[]>(replies); 
     const [file, setFile] = useState<File|null>(null);
     const dispatch = useDispatch();
     const user = window.sessionStorage.getItem("user");
     const userId = memberId.toString();
     const loginState = useSelector((state:any)=>state.login);
     const replySet = useSelector((state:any)=>state.replyEdit === boardId);
-    const csrfToken = useSelector((state:any)=>state.csrfToken);
-    const bordSet = useSelector((state:any)=>state.boardEdit === boardId);
+    const boardSet = useSelector((state:any)=>state.boardEdit === boardId);
     const isMyself = user === userId;
 
     const onDelete = async() => {
         const ok = confirm("Are you sure you want to delete this tweet?");
         if(!ok || false) return;
         try {
-            const response = await axios.delete(`http://localhost:8080/api/board/${boardId}`, {
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                withCredentials : true,
-            });
+            const response = await axiosConfig.delete(`/api/board/${boardId}`);
 
             if(response.status == 200) {
                 onTweetPosted();
             }
-            dispatch({type: "BOARD_EDIT", payload: null});
         } catch (e) {
             console.log(e);
-            dispatch({type: "BOARD_EDIT", payload: null});
         } finally {
             dispatch({type: "BOARD_EDIT", payload: null});
         }
@@ -191,7 +183,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
                         .replace(/&nbsp;/g, '') 
                         .trim();
         if(replaced === "") {
-            alert("Please input it")
+            alert("글을 입력해 주세요")
             return;
         };
         try{
@@ -202,12 +194,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
             if(file !== null){
                 formData.append("file", file);
             }
-            const response = await axios.put("http://localhost:8080/api/board",formData, {
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                withCredentials : true,
-            });
+            const response = await axiosConfig.put("/api/board",formData);
 
             if(response.status == 200) {
                 onTweetPosted();
@@ -216,7 +203,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
         }catch(e) {
             console.log(e);
             if(e instanceof AxiosError && e.status === 401) {
-                alert("Please Log in");
+                alert("로그인이 필요합니다.");
             }
         }finally {
             setFile(null);
@@ -226,7 +213,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
 
     const onReplySubmit = async() => {
         if(content.trim() === ""){
-            alert("Please input message");
+            alert("글을 입력해 주세요");
             return;
         }
         if(content.length > 200) return;
@@ -242,7 +229,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
                 onTweetPosted();
             }
         }catch(e){
-            if(e === AxiosError) {
+            if(e instanceof AxiosError){
                 console.log(e);
             }
         }
@@ -287,11 +274,11 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
     return (<Wrapper isMyself={isMyself}>
         <Column>
             <Username>{memberName}</Username>
-            {bordSet ? <StyledQuill value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
+            {boardSet ? <StyledQuill value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
             <Payload dangerouslySetInnerHTML={{ __html: cleanHtml }}></Payload>}
-            {user === userId ? <BasicButton onClick={onDelete}>Delete</BasicButton> : null}
-            {user === userId ? bordSet ? <BasicButton className="cancelBtn" onClick={onEdit}>cancel</BasicButton> :<BasicButton onClick={onEdit}>Eidt</BasicButton> : null}
-            {user === userId ? bordSet ? <BasicButton className="editSubmitBtn" onClick={onEditSubmit}>Edit Tweet</BasicButton> : null : null}
+            {isMyself ? <BasicButton onClick={onDelete}>Delete</BasicButton> : null}
+            {isMyself ? boardSet ? <BasicButton className="cancelBtn" onClick={onEdit}>cancel</BasicButton> :<BasicButton onClick={onEdit}>Edit</BasicButton> : null}
+            {isMyself ? boardSet ? <BasicButton className="editSubmitBtn" onClick={onEditSubmit}>Edit Tweet</BasicButton> : null : null}
             {loginState ? <BasicButton className="reply_button" onClick={onReply}>reply</BasicButton>: null}
             
             {/* === 여기서 replyList 표시 === */}

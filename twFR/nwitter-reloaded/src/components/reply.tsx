@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ReplyList } from "./timeline";
+import { IReply } from "./timeline";
 import { useEffect, useState } from "react";
 import axiosConfig from "../api/axios"
 import { AxiosError } from "axios";
@@ -29,11 +29,10 @@ const Username = styled.p<{isMyself:boolean}>`
     color:${props => props.isMyself ? '#ffffc1' : 'white'};
 `;
 
-export default function Reply({ id, boardId , memberId, insertTime, updateTime, memberName, content, onTweetPosted }:ReplyList) {
+export default function Reply({ id, boardId , memberId, insertTime, updateTime, memberName, content, onTweetPosted }:IReply) {
     const [myContent, setMyContent] = useState(content);
     const user = window.sessionStorage.getItem("user");
     const isMyself = user === memberId.toString();
-    const userId = memberId.toString();
 
     const onDelete = async() => {
         const ok = confirm("Are you sure you want to delete?");
@@ -44,7 +43,7 @@ export default function Reply({ id, boardId , memberId, insertTime, updateTime, 
                 onTweetPosted();
             }
         }catch(e){
-            if(e === AxiosError) {
+            if(e instanceof AxiosError){
                 console.log(e);
             }
         }
@@ -57,7 +56,7 @@ export default function Reply({ id, boardId , memberId, insertTime, updateTime, 
         <Wrapper>
             <Column>
                 └{isMyself ? <p>💙</p>:null}<Username isMyself={isMyself}>{memberName}</Username><p id="comma">:</p><p>{myContent}</p>
-                {user === userId ? <p onClick={onDelete} className="right_del">✖</p> : null}
+                {isMyself ? <p onClick={onDelete} className="right_del">✖</p> : null}
             </Column>
         </Wrapper>
     )

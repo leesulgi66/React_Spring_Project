@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Tweet from "./tweet";
 import axios, { AxiosError } from "axios";
+import axiosConfig from "../api/axios"
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import CsrfToken from "./csrfTokenGet";
@@ -18,8 +19,11 @@ export interface ITweet {
     replies: [];
     onTweetPosted: () => void;
 }
+export interface TweetProps extends ITweet {
+    onTweetPosted: () => void;
+}
 
-export interface ReplyList {
+export interface IReply {
     id : number;
     boardId : number;
     memberId: number;
@@ -49,12 +53,7 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
     const fetchTweets = async(page = 0) => {
         setLoading(true);
         try{
-            const response = await axios.get(`http://localhost:8080/api/board`, {
-            params: {
-                page: page
-            },
-            withCredentials: true
-        });
+            const response = await axiosConfig.get(`/api/board`);
         const newTweets = response.data.content;
         setTweets(prev => 
             page === 0 
@@ -75,21 +74,6 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
             setLoading(false);
         }
     }
-
-    const getToken = async(token:string)=>{
-        dispatch({type: "SET_STRING", payload : token});
-    }
-        
-    useEffect(() => { // csrf 토큰이 없다면 재발급
-        if(csrfToken === null){
-            CsrfToken().then(token => {
-                getToken(token);
-            }).catch(error => {
-                console.log(error);
-                dispatch({type: "SET_LOGIN", payload: false});
-            });
-        }
-    }, [tweetsUpdated]); 
 
     useEffect(() => { // 첫 로딩시 페이지 초기화
         setPage(0);

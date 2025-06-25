@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
+import axiosConfig from "../api/axios"
 import { useDispatch, useSelector } from "react-redux";
 import CsrfToken from "../components/csrfTokenGet";
 import KakaoButton from "../components/kakao-btn";
@@ -57,13 +58,12 @@ const Switcher = styled.span`
     }
 `;
 
-export default function CreateAccount() {
+export default function LoginForm() {
     const navigate = useNavigate();
     const [isLoading, setLoading] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const csrfToken = useSelector((state:any)=>state.csrfToken);
     const loginState = useSelector((state:any) => state.login);
     const dispatch = useDispatch();
 
@@ -84,14 +84,10 @@ export default function CreateAccount() {
             formData.append("email", email);
             formData.append("password", password);
 
-            const response = await axios({
-                url: "http://localhost:8080/loginApi",
+            const response = await axiosConfig({
+                url: "/loginApi",
                 method: 'POST',
                 data: formData,
-                withCredentials: true,
-                headers:{
-                    'X-CSRF-TOKEN': csrfToken
-                }
             });
 
             if(response.status === 201) {
@@ -136,18 +132,12 @@ export default function CreateAccount() {
         navigate('/');
     }
 
-    useEffect(()=>{
-        CsrfToken().then(token => {
-            getToken(token);
-        });
-    },[]);
-
     return (
         <Wrapper>
             <Title onClick={onFocus}>Log into X</Title>
             <Form onSubmit={onSubmit}>
                 <Input onChange={onChange} name="email" value={email} placeholder="Email" type="text" required/>
-                <Input onChange={onChange} name="password" value={password} placeholder="Password" type="password" required/>
+                <Input onChange={onChange} name="password" value={password} placeholder="Password" type="password" autoComplete="off" required/>
                 <Input type="submit" value={isLoading ? "Loading..." : "Log in"}/>
             </Form>
             {error !== "" ? <Error>{error}</Error> : null}

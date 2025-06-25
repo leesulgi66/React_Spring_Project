@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 export default function CsrfToken() {
     const getToken = async()=>{
@@ -9,7 +9,9 @@ export default function CsrfToken() {
             }
         }
         catch(e){
-            console.log(e);
+            if(e instanceof AxiosError){
+                console.log(e);
+            }
         }
     }
     return getToken();

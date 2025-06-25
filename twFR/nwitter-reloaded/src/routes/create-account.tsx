@@ -1,8 +1,9 @@
 import { useState } from "react";
 import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom";
-import GithubButton from "../components/kakao-btn";
+import KakaoButton from "../components/kakao-btn";
 import axios, { AxiosError } from "axios";
+import axiosConfig from "../api/axios"
 import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
@@ -63,7 +64,6 @@ export default function CreateAccount() {
     const [password, setPassword] = useState("");
     const [passwordCheck, setPasswordCheck] = useState("");
     const [error, setError] = useState("");
-    const csrfToken = useSelector((state:any)=>state.csrfToken);
 
     const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
         const {target: { name, value }} = e;
@@ -82,28 +82,26 @@ export default function CreateAccount() {
         setError("");
         if(isLoading || username === "" || email === "" || password === "") return;
         if(password !== passwordCheck) {
-            setError("password check");
+            setError("Passwords do not match");
             return
         }
-        console.log(email);
+        if(!/\S+@\S+\.\S+/.test(email)) {
+            setError("올바른 이메일 형식이 아닙니다.");
+            return;
+        }
         try{
-            const response = await axios.post("http://localhost:8080/api/user/signIn", 
+            const response = await axiosConfig.post("/api/user/signUp", 
                 {
                     username,
                     password,
                     email               
-                },
-                {   
-                    headers: { 'X-CSRF-TOKEN': csrfToken },
-                    withCredentials : true,
-                },
+                }
             );
             
             console.log(response);
 
             if(response.status == 200) {
                 alert("회원가입 완료");
-                setLoading(false);
                 navigate("/login");
             }
             
@@ -111,7 +109,7 @@ export default function CreateAccount() {
             if(e instanceof AxiosError){
                 console.log(e.response);
                 if(e.response?.status === 500)
-                setError(e.response?.data);
+                setError(e.response?.data || "회원가입에 실패했습니다. 잠시후 시도해 주세요.");
             }
         }finally {
             setLoading(false);
@@ -131,7 +129,7 @@ export default function CreateAccount() {
             <Switcher>
                 Already have an account? <Link to="/login">Log in &rarr;</Link>
             </Switcher>
-            <GithubButton />
+            <KakaoButton />
         </Wrapper>
     )
 }

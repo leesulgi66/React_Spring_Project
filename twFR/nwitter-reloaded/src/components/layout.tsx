@@ -1,6 +1,7 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios, { AxiosError } from "axios";
+import axiosConfig from "../api/axios"
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
@@ -77,12 +78,7 @@ export default function Layout() {
         const ok = confirm("로그아웃을 원하십니까?");
         if(ok) {
             try{
-                const response = await axios.post("http://localhost:8080/logout",{},{
-                    withCredentials : true,
-                    headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    },
-                });
+                const response = await axiosConfig.post("/logout");
                 if(response.status === 200){
                     setUser(null);
                     window.sessionStorage.removeItem("user");
@@ -90,7 +86,9 @@ export default function Layout() {
                     navigate("/");
                 }
             }catch(e){
-                console.log(e);
+                if(e instanceof AxiosError){
+                    console.log(e);
+                }
                 //navigate("/login");
             }finally {
                 setUser(null);
@@ -124,7 +122,7 @@ export default function Layout() {
                         <path clip-rule="evenodd" fill-rule="evenodd" d="M19 10a.75.75 0 0 0-.75-.75H8.704l1.048-.943a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 1 0 1.004-1.114l-1.048-.943h9.546A.75.75 0 0 0 19 10Z"></path>
                     </svg>
                 </MenuItem> : 
-                <MenuItem onClick={onLogIn} className="log-out, log-in">
+                <MenuItem onClick={onLogIn} className="log-out log-in">
                     <p>login</p>
                 </MenuItem>}
             </Menu>

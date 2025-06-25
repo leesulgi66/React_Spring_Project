@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import axiosConfig from "../api/axios"
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -11,14 +12,18 @@ export default function ProtectedRoute({children} : {children:React.ReactNode}) 
     const loginCheck = async ()=> {
         if(!user) {
             navigate("/login");
+            return;
         }
         try{
-            const response = await axios.get("http://localhost:8080/api/user/check",{withCredentials : true})
+            const response = await axiosConfig.get("/api/user/check",{withCredentials : true})
             if(response.status === 200) {
                 window.sessionStorage.setItem("user", response.data);
                 setLoading(false);
                 return children;
+            }else{
+                return null;
             }
+            
         }catch(e) {
             if(e instanceof AxiosError){
                 console.log(e.message);

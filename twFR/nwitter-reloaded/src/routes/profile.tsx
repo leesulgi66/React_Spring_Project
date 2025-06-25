@@ -6,7 +6,6 @@ import axios, { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import CsrfToken from "../components/csrfTokenGet";
 
 const Wrapper = styled.div`
     display: flex;
@@ -113,7 +112,6 @@ export default function Profile() {
     const [hasMore, setHasMore] = useState<boolean>(true);
     const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
-    const csrfToken = useSelector((state:any)=>state.csrfToken);
     const dispatch = useDispatch();
 
     const fetchTweets = async(page = 0) => {
@@ -135,7 +133,7 @@ export default function Profile() {
         }catch(e){
             if(e instanceof AxiosError) {
                 console.log(e.message);
-                alert("Please Log in");
+                alert("로그인이 필요합니다.");
                 navigate("/login");
             }
         }
@@ -148,7 +146,7 @@ export default function Profile() {
     useEffect(()=>{
         const userInfo = async() => {
             try{
-                const response:{data:userInfo} = await axios.get("http://localhost:8080/api/user",{withCredentials : true});
+                const response:{data:userInfo} = await axiosConfig.get("/api/user");
                 setUser(response.data);
                 setAvatar(response.data?.profileImage);
             }catch(e){
@@ -156,15 +154,6 @@ export default function Profile() {
                     console.log(e.message);
                 }
             }
-        }
-
-        const getToken = async(token:string)=>{
-            dispatch({type: "SET_STRING", payload : token});
-        }
-        if(csrfToken === null){
-            CsrfToken().then(token => {
-                getToken(token);
-            });
         }
         userInfo();
     }, [profileUpdate, avatar]); 
@@ -193,8 +182,8 @@ export default function Profile() {
         const { files } = e.target;
         if(!user) return;
         if(!files || files.length === 0) return;
-        if(files[0].size > 1 * 1024 * 1024) {
-            alert("Image file size should be less than 2Mb");
+        if(files[0].size > 2 * 1024 * 1024) {
+            alert("최대 2Mb의 이미지를 사용할 수 있습니다.");
             return;
         };
         try{
@@ -202,12 +191,7 @@ export default function Profile() {
             const formData = new FormData
             formData.append("file", files[0]);
 
-            const response = await axios.patch("http://localhost:8080/api/user",formData, {
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                withCredentials : true,
-            });
+            const response = await axiosConfig.patch("/api/user",formData);
 
             if(response.status == 200) {
                 setAvatar(response.data?.profileImage + '?t=' + Date.now());
@@ -216,7 +200,7 @@ export default function Profile() {
         }catch(e){  
             console.log(e);
             if(e instanceof AxiosError && e.status === 401) {
-                alert("Please Log in");
+                alert("로그인이 필요합니다.");
                 navigate("/login");
             }
         }finally{
@@ -241,13 +225,13 @@ export default function Profile() {
     };
 
     const editDone = async ()=> {
-        const ok = confirm("Are you sure you want to edit this profile?");
+        const ok = confirm("이름을 변경하시겠습니까?");
         if(!ok || !user) return;
         const special_pattern = /[`~!@#$%^&*|\\\'\";:\/?]/gi;
         if(inputText!.search(/\s/g) > -1 || inputText === "") {
-            alert("There is a blank space in your name.");
+            alert("이름에 공백은 사용할 수 없습니다.");
         }else if(special_pattern.test(inputText!) == true){
-            alert("You can't use special characters.");
+            alert("이름에 특수문자는 사용할 수 없습니다.");
         }else{
             console.log("you can use");
             try{
@@ -255,12 +239,7 @@ export default function Profile() {
                 const formData = new FormData
                 formData.append("username", inputText);
 
-                const response = await axios.patch("http://localhost:8080/api/user",formData, {
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                    },
-                    withCredentials : true,
-                });
+                const response = await axiosConfig.patch("/api/user",formData);
 
                 if(response.status == 200) {
                     updateAction();
@@ -269,11 +248,11 @@ export default function Profile() {
             }catch(e){  
                 console.log(e);
                 if(e instanceof AxiosError) {
-                    if(e.status === 401){
-                        alert("Please Log in");
+                    if(e.response?.status === 401){
+                        alert("로그인이 필요합니다.");
                         navigate("/login");
-                    }else if(e.status === 500){
-                        alert("You can't use");
+                    }else if(e.response?.status === 500){
+                        alert("이미 사용중인 이름입니다.");
                     }
                 }
             }
@@ -282,16 +261,11 @@ export default function Profile() {
 
     const ondelete = async()=>{
         let okConfirm = false;
-        const ok = confirm("Are you sure you want to delete this?");
-        if(ok) {okConfirm = confirm("All your data delete")};
+        const ok = confirm("계정을 삭제하시겠습니까?");
+        if(ok) {okConfirm = confirm("모든 데이터가 삭제됩니다.")};
         if(!ok || !user || !okConfirm) return;
         try{
-            const response = await axios.delete("http://localhost:8080/api/user", {
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                withCredentials : true,
-            });
+            const response = await axiosConfig.delete("/api/user");
 
             if(response.status == 200) {
                 window.sessionStorage.removeItem("user");
@@ -301,8 +275,8 @@ export default function Profile() {
             }
         }catch(e){  
             console.log(e);
-            if(e instanceof AxiosError && e.status === 401) {
-                alert("Please Log in");
+            if(e instanceof AxiosError && e.response?.status === 401) {
+                alert("로그인이 필요합니다.");
                 navigate("/login");
             }
         }

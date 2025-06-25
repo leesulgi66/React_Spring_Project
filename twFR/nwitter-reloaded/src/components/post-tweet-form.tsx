@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import axiosConfig from "../api/axios"
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css'
@@ -58,16 +59,11 @@ const StyledQuill = styled(ReactQuill)`
 export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => void }) {
     const [isLoading, setLoading] = useState(false);
     const [tweet, setTweet] = useState("");
-    const [file, setFile] = useState<File|null>(null);
     const [user, setUser] = useState(window.sessionStorage.getItem("user"));
     const loginState = useSelector((state:any) => state.login);
-    const csrfToken = useSelector((state:any)=>state.csrfToken);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const onChange = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
-        setTweet(e.target.value);
-    }
     const onClick = () => {
         if(loginState === false) {
             const ok = confirm("You need to log in. Do you want to log in?");
@@ -86,46 +82,38 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
                          .replace(/&nbsp;/g, '') // nbsp 제거
                          .trim();
         if(isLoading || replaced === "") {
-            alert("Please input it")
+            alert("글을 입력해 주세요")
             return};
         try{
             setLoading(true);
             if(user === null) {
-                alert("Please login");
+                alert("로그인이 필요합니다.");
                 return
             }
             const formData = new FormData();
             formData.append("user", user);
             formData.append("tweet", tweet);
-            if(file !== null){
-                formData.append("file", file);
-            }else{
-                formData.append("dummy", new Blob([""], { type: "text/plain" }), "dummy.txt");
-            }
-            const response = await axios.post("http://localhost:8080/api/board",formData, {
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                withCredentials : true,
-            });
+
+            const response = await axiosConfig.post("/api/board",formData);
 
             if(response.status == 200) {
                 setLoading(false);
                 onTweetPosted();
             }
             setTweet("");
-            setFile(null);
         }catch(e){  
             console.log(e);
             if(e instanceof AxiosError && e.status === 401) {
-                alert("Please Log in");
+                alert("로그인이 필요합니다.");
                 dispatch({type: "SET_LOGIN", payload: false});
                 navigate("/login");
+            }
+            if(e instanceof AxiosError && e.status === 500) {
+                alert("이미지와 기타파일의 용량이 너무 큽니다.");
             }
             
         }finally {
             setLoading(false);
-            setFile(null);
         }
     }
 
