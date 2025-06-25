@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom";
-import GithubButton from "../components/github-btn";
+import GithubButton from "../components/kakao-btn";
 import axios, { AxiosError } from "axios";
 import { useSelector } from "react-redux";
 

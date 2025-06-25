@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const Button = styled.span`
     margin-top: 40px;
-    background-color: white;
+    background-color: #fde500;
     font-weight: 500;
     width: 100%;
     color: black;
@@ -21,11 +21,11 @@ const Logo = styled.img`
     height: 25px;
 `;
 
-export default function GithubButton() {
+export default function KakaoButton() {
     const navigate = useNavigate();
     const onClick = async () => {
         try {
-            console.log(11);
+            
             navigate("/");
         } catch (error) {
             console.log(error);
@@ -33,8 +33,8 @@ export default function GithubButton() {
     };
     return (
         <Button onClick={onClick}>
-            <Logo src="/github-logo.svg" />
-            Continue with Github
+            <Logo src="/social-img-kakao.png" />
+            Continue with Kakao
         </Button>
     );
 }

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom";
-import GithubButton from "../components/github-btn";
 import axios, { AxiosError } from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import CsrfToken from "../components/csrfTokenGet";
+import KakaoButton from "../components/kakao-btn";
 
 const Wrapper = styled.div`
     height: 100%;
@@ -154,7 +154,7 @@ export default function CreateAccount() {
             <Switcher>
                     Don't have an account? <Link to="/create-account">Create one &rarr;</Link>
             </Switcher>
-            <GithubButton />
+            <KakaoButton />
         </Wrapper>
     )
 }
