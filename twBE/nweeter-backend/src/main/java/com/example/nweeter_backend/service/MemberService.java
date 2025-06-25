@@ -7,6 +7,7 @@ import com.example.nweeter_backend.handler.ImageHandler;
 import com.example.nweeter_backend.modle.Member;
 import com.example.nweeter_backend.repository.BoardRepository;
 import com.example.nweeter_backend.repository.MemberRepository;
+import com.example.nweeter_backend.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
+    private final ReplyRepository replyRepository;
     private final ImageHandler imageHandler;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -78,6 +80,7 @@ public class MemberService {
     @Transactional
     public void deleteMember(PrincipalDetails principal) {
         Member member = principal.getMember();
+        replyRepository.deleteByMember(member);
         int boards = boardRepository.boards(member.getId());
         System.out.println("delete boards count : " + boards);
         memberRepository.delete(member);
