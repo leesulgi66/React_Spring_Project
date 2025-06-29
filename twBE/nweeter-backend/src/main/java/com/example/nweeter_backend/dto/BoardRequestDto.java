@@ -13,5 +13,4 @@ public class BoardRequestDto implements Serializable {
     private Long Id;
     private String user;
     private String tweet;
-    private MultipartFile file;
 }

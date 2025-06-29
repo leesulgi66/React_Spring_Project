@@ -10,6 +10,7 @@ import com.example.nweeter_backend.repository.MemberRepository;
 import com.example.nweeter_backend.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,6 +46,27 @@ public class MemberService {
         saveMember.setPassword(encPassword);
         saveMember.setEmail(member.getEmail());
         memberRepository.save(saveMember);
+    }
+
+    @Transactional
+    public Optional<Member> googleSave(OAuth2User oAuth2User, String provider ) {
+        Member member = new Member();
+        String providerId = oAuth2User.getAttribute("sub");
+        String username = provider+"_"+oAuth2User.getAttribute("name");
+        String password = passwordEncoder.encode(providerId);
+        String email = oAuth2User.getAttribute("email");
+        String profileImg = oAuth2User.getAttribute("picture");
+
+        member.setProvider(provider);
+        member.setProviderId(providerId);
+        member.setUsername(username);
+        member.setPassword(password);
+        member.setEmail(email);
+        member.setProfileImage(profileImg);
+        memberRepository.save(member);
+        System.out.println("board google save ok");
+
+        return Optional.of(member);
     }
 
     @Transactional(readOnly = true)

@@ -1,5 +1,6 @@
 package com.example.nweeter_backend.config;
 
+import com.example.nweeter_backend.auth.PrincipalOauth2UserService;
 import com.example.nweeter_backend.handler.CustomAuthenticationFailureHandler;
 import com.example.nweeter_backend.handler.CustomAuthenticationSuccessHandler;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,7 +13,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
@@ -28,6 +28,7 @@ public class SecurityConfig {
 
     final private CustomAuthenticationSuccessHandler authenticationSuccessHandler;
     final private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    final private PrincipalOauth2UserService principalOauth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -52,6 +53,13 @@ public class SecurityConfig {
                         .failureHandler(customAuthenticationFailureHandler)
                         .permitAll()
                 )
+                .oauth2Login(oauth ->  oauth
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(principalOauth2UserService))
+                        .defaultSuccessUrl("http://localhost:5173/")
+                        .failureHandler(customAuthenticationFailureHandler)
+                        .permitAll()
+                )
         ;
         http
                 .logout((config) -> config
@@ -72,12 +80,6 @@ public class SecurityConfig {
         ;
 
         return http.build();
-    }
-
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean

@@ -33,8 +33,8 @@ public class MemberApiController {
         return new ResponseEntity<>(principalDetails.getMember().getId() , HttpStatus.OK);
     }
 
-    @PostMapping("/user/signIn")
-    public ResponseEntity<String> signIn(@RequestBody MemberSignInRequestDto member) throws IOException {
+    @PostMapping("/user/signUp")
+    public ResponseEntity<String> signUp(@RequestBody MemberSignInRequestDto member) throws IOException {
         log.info("sign in call");
         memberService.save(member);
         return new ResponseEntity<>("save ok", HttpStatus.OK);

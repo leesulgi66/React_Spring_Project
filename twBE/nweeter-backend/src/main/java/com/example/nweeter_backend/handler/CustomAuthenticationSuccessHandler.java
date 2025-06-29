@@ -23,7 +23,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
-        System.out.println(csrfToken.getToken());
+        System.out.println("login success, csrfToken : "+csrfToken.getToken());
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         response.setHeader("X-CSRF-TOKEN", csrfToken.getToken());
         response.setStatus(201);

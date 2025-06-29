@@ -2,6 +2,7 @@ package com.example.nweeter_backend.modle;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Data
 @Entity
 public class Member {
@@ -33,6 +35,12 @@ public class Member {
     @Column
     private String profileImageKey;
 
+    @Column
+    private String provider;
+
+    @Column
+    private String providerId;
+
     @CreationTimestamp
     @Column(name = "time_ins")
     private LocalDateTime insertTime;
@@ -40,5 +48,4 @@ public class Member {
     @UpdateTimestamp
     @Column(name = "time_upd")
     private LocalDateTime updateTime;
-
 }
