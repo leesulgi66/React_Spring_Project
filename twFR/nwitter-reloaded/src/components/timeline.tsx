@@ -46,28 +46,25 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
     const [page, setPage] = useState<number>(0);
     const [hasMore, setHasMore] = useState<boolean>(true);
     const [loading, setLoading] = useState<boolean>(false);
-    const navigate = useNavigate();
-    const csrfToken = useSelector((state:any) => state.csrfToken);
     const dispatch = useDispatch(); 
 
     const fetchTweets = async(page = 0) => {
         setLoading(true);
         try{
             const response = await axiosConfig.get(`/api/board`);
-        const newTweets = response.data.content;
-        setTweets(prev => 
-            page === 0 
-                ? newTweets // 처음 페이지
-                : [...prev, ...newTweets] // 기존 페이지 + 새 페이지
-        );
+            const newTweets = response.data.content;
+            setTweets(prev => 
+                page === 0 
+                    ? newTweets // 처음 페이지
+                    : [...prev, ...newTweets] // 기존 페이지 + 새 페이지
+            );
         // 마지막 페이지인지 판단
         setHasMore(!response.data.last);
         }catch(e){
             if(e instanceof AxiosError) {
                 console.log(e.message);
                 alert("Server is down");
-                window.sessionStorage.removeItem("user");
-                dispatch({type: "SET_LOGIN", payload: false});
+                dispatch({type: "SET_USER", payload: null});
                 //navigate("/login");
             }
         }finally{

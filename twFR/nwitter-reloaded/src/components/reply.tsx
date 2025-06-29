@@ -3,6 +3,7 @@ import { IReply } from "./timeline";
 import { useEffect, useState } from "react";
 import axiosConfig from "../api/axios"
 import { AxiosError } from "axios";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
 
@@ -31,8 +32,8 @@ const Username = styled.p<{isMyself:boolean}>`
 
 export default function Reply({ id, boardId , memberId, insertTime, updateTime, memberName, content, onTweetPosted }:IReply) {
     const [myContent, setMyContent] = useState(content);
-    const user = window.sessionStorage.getItem("user");
-    const isMyself = user === memberId.toString();
+    const user = useSelector((state:any)=>state.user);
+    const isMyself = user === memberId;
 
     const onDelete = async() => {
         const ok = confirm("Are you sure you want to delete?");

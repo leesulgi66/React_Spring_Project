@@ -5,7 +5,7 @@ function reducer(currentState, action) {
     if(currentState === undefined) {
         return {
             csrfToken: null,
-            login: false,
+            user: null,
             replyEdit: null,
             boardEdit: null,
         }
@@ -18,10 +18,10 @@ function reducer(currentState, action) {
             csrfToken: action.payload
         };
     }
-    if(action.type === "SET_LOGIN") {
+    if(action.type === "SET_USER") {
         return {
             ...newState,
-            login: action.payload
+            user: action.payload
         };
     };
     if(action.type === "REPLY_EDIT"){

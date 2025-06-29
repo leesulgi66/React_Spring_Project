@@ -94,7 +94,7 @@ const DeleteId = styled.div`
     cursor: pointer;
 `;
 
-export interface userInfo{
+export interface IuserInfo{
     id: number,
     username: string,
     email: string,
@@ -102,9 +102,9 @@ export interface userInfo{
 }
 
 export default function Profile() {
-    const [user, setUser] = useState<userInfo>();
+    const [userInfo, setUserInfo] = useState<IuserInfo>();
     const [avatar, setAvatar] = useState<string | undefined>(undefined);
-    const [inputText, setInputText] = useState(user?.username || "Anonymous");
+    const [inputText, setInputText] = useState(userInfo?.username || "Anonymous");
     const [isEditing, setEditing] = useState(false);
     const [tweets, setTweets] = useState<ITweet[]>([]);
     const [profileUpdate, setProfileUpdate] = useState(false);
@@ -119,8 +119,7 @@ export default function Profile() {
         const response = await axiosConfig.get("/api/board/user",{
             params: {
                 page: page
-            },
-            withCredentials: true
+            }
         });
         const newTweets = response.data.content;
         setTweets(prev => 
@@ -144,10 +143,10 @@ export default function Profile() {
     }
 
     useEffect(()=>{
-        const userInfo = async() => {
+        const fetchUserInfo = async() => {
             try{
-                const response:{data:userInfo} = await axiosConfig.get("/api/user");
-                setUser(response.data);
+                const response:{data:IuserInfo} = await axiosConfig.get("/api/user");
+                setUserInfo(response.data);
                 setAvatar(response.data?.profileImage);
             }catch(e){
                 if(e instanceof AxiosError) {
@@ -155,7 +154,7 @@ export default function Profile() {
                 }
             }
         }
-        userInfo();
+        fetchUserInfo();
     }, [profileUpdate, avatar]); 
 
     useEffect(() => { // 첫 로딩시 페이지 초기화
@@ -180,14 +179,14 @@ export default function Profile() {
 
     const onAvatarCahange = async (e:React.ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;
-        if(!user) return;
+        if(!userInfo) return;
         if(!files || files.length === 0) return;
         if(files[0].size > 2 * 1024 * 1024) {
             alert("최대 2Mb의 이미지를 사용할 수 있습니다.");
             return;
         };
         try{
-            if(user === null) return
+            if(userInfo === null) return
             const formData = new FormData
             formData.append("file", files[0]);
 
@@ -210,7 +209,7 @@ export default function Profile() {
 
     const onEdit = () => {
         setEditing(!isEditing);
-        setInputText(user?.username || "");
+        setInputText(userInfo?.username || "");
     }
 
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -226,7 +225,7 @@ export default function Profile() {
 
     const editDone = async ()=> {
         const ok = confirm("이름을 변경하시겠습니까?");
-        if(!ok || !user) return;
+        if(!ok || !userInfo) return;
         const special_pattern = /[`~!@#$%^&*|\\\'\";:\/?]/gi;
         if(inputText!.search(/\s/g) > -1 || inputText === "") {
             alert("이름에 공백은 사용할 수 없습니다.");
@@ -235,7 +234,7 @@ export default function Profile() {
         }else{
             console.log("you can use");
             try{
-                if(user === null) return
+                if(userInfo === null) return
                 const formData = new FormData
                 formData.append("username", inputText);
 
@@ -263,13 +262,12 @@ export default function Profile() {
         let okConfirm = false;
         const ok = confirm("계정을 삭제하시겠습니까?");
         if(ok) {okConfirm = confirm("모든 데이터가 삭제됩니다.")};
-        if(!ok || !user || !okConfirm) return;
+        if(!ok || !userInfo || !okConfirm) return;
         try{
             const response = await axiosConfig.delete("/api/user");
 
             if(response.status == 200) {
-                window.sessionStorage.removeItem("user");
-                dispatch({type: "SET_LOGIN", payload: false});
+                dispatch({type: "SET_USER", payload: null});
                 console.log("del user");
                 navigate("/");
             }
@@ -291,7 +289,7 @@ export default function Profile() {
             </AvatarUpload>
             <AvatarInput onChange={onAvatarCahange} id="avatar" type="file" accept="image/*"/>
             <Name>
-                {isEditing ? <TextArea onChange={onChange} rows={1} maxLength={20} onKeyDown={handleKeyPress} value={inputText as string} required /> : user?.username || "Anonymous"}
+                {isEditing ? <TextArea onChange={onChange} rows={1} maxLength={20} onKeyDown={handleKeyPress} value={inputText as string} required /> : userInfo?.username || "Anonymous"}
                 <EditButton>
                     {isEditing ? <svg onClick={onEdit} fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />

@@ -59,14 +59,13 @@ const StyledQuill = styled(ReactQuill)`
 export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => void }) {
     const [isLoading, setLoading] = useState(false);
     const [tweet, setTweet] = useState("");
-    const [user, setUser] = useState(window.sessionStorage.getItem("user"));
-    const loginState = useSelector((state:any) => state.login);
+    const user = useSelector((state:any) => state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const onClick = () => {
-        if(loginState === false) {
-            const ok = confirm("You need to log in. Do you want to log in?");
+        if(user === null) {
+            const ok = confirm("글쓰기를 하려면 로그인이 필요합니다. 로그인 하시겠습니까?");
             if(!ok) {
                 (document.activeElement as HTMLElement).blur() 
                 navigate("/");
@@ -105,7 +104,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             console.log(e);
             if(e instanceof AxiosError && e.status === 401) {
                 alert("로그인이 필요합니다.");
-                dispatch({type: "SET_LOGIN", payload: false});
+                dispatch({type: "SET_USER", payload: null});
                 navigate("/login");
             }
             if(e instanceof AxiosError && e.status === 500) {

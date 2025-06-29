@@ -6,6 +6,7 @@ import axiosConfig from "../api/axios"
 import { useDispatch, useSelector } from "react-redux";
 import CsrfToken from "../components/csrfTokenGet";
 import KakaoButton from "../components/kakao-btn";
+import GoogleButton from "../components/google-btn";
 
 const Wrapper = styled.div`
     height: 100%;
@@ -64,7 +65,6 @@ export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const loginState = useSelector((state:any) => state.login);
     const dispatch = useDispatch();
 
     const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
@@ -92,9 +92,8 @@ export default function LoginForm() {
 
             if(response.status === 201) {
                 //console.log("로그인 data : ",response.data); // user id
-                window.sessionStorage.setItem("user", response.data);
-                dispatch({type: "SET_LOGIN", payload: true});
-                const csrfToken = response.headers['x-csrf-token']; 
+                dispatch({type: "SET_USER", payload: response.data});
+                const csrfToken = response.headers['x-csrf-token']; // 로그인 후 재발급
                 dispatch({type: "SET_STRING", payload : csrfToken});
                 alert("로그인 성공");
                 setError("");
@@ -111,12 +110,10 @@ export default function LoginForm() {
                 console.log("error : ", e);
                 console.log("e status : ", e.status);
                 setError(e.name);
-                if(e.status === 401) {
-                    if(e.message === "Request failed with status code 401"){
-                        CsrfToken().then(token => {
-                            getToken(token);
-                        });
-                    }
+                if(e.status === 403 || e.status === 401) { 
+                    CsrfToken().then(token => {
+                        getToken(token);
+                    });
                 }
             }
         }finally {
@@ -144,6 +141,7 @@ export default function LoginForm() {
             <Switcher>
                     Don't have an account? <Link to="/create-account">Create one &rarr;</Link>
             </Switcher>
+            <GoogleButton />
             <KakaoButton />
         </Wrapper>
     )

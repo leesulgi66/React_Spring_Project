@@ -11,7 +11,7 @@ import Reply from "./reply";
 
 const Wrapper = styled.div<{isMyself:boolean}>`
     padding: 20px;
-    border: 1px solid ${props => props.isMyself ? '#b2e0ff' : 'rgba(255,255,255,0.5)'};
+    border: 2px solid ${props => props.isMyself ? '#b2e0ff' : 'rgba(255,255,255,0.5)'};
     border-radius: 15px;
 `;
 
@@ -146,18 +146,16 @@ const ReplyDiv = styled.div`
 `;
 
 
-export default function Tweet({memberName, photo, tweet, boardId, memberId, replies ,onTweetPosted}:ITweet) {
+export default function Tweet({memberName, tweet, boardId, memberId, replies ,onTweetPosted}:ITweet) {
     const [content, setContent] = useState("");
     const [changeTweet, setChangeTweet] = useState(tweet);
     const [replyList, setReplyList] = useState<IReply[]>(replies); 
     const [file, setFile] = useState<File|null>(null);
     const dispatch = useDispatch();
-    const user = window.sessionStorage.getItem("user");
-    const userId = memberId.toString();
-    const loginState = useSelector((state:any)=>state.login);
+    const user = useSelector((state:any)=>state.user);
     const replySet = useSelector((state:any)=>state.replyEdit === boardId);
     const boardSet = useSelector((state:any)=>state.boardEdit === boardId);
-    const isMyself = user === userId;
+    const isMyself = user === memberId
 
     const onDelete = async() => {
         const ok = confirm("Are you sure you want to delete this tweet?");
@@ -236,7 +234,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
     }
 
     const onEdit = () => {
-        if(user !== userId) return;
+        if(user !== memberId) return;
         dispatch({type: "BOARD_EDIT", payload: boardId});
         dispatch({type: "REPLY_EDIT", payload: null});
         setChangeTweet(tweet);
@@ -279,7 +277,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
             {isMyself ? <BasicButton onClick={onDelete}>Delete</BasicButton> : null}
             {isMyself ? boardSet ? <BasicButton className="cancelBtn" onClick={onEdit}>cancel</BasicButton> :<BasicButton onClick={onEdit}>Edit</BasicButton> : null}
             {isMyself ? boardSet ? <BasicButton className="editSubmitBtn" onClick={onEditSubmit}>Edit Tweet</BasicButton> : null : null}
-            {loginState ? <BasicButton className="reply_button" onClick={onReply}>reply</BasicButton>: null}
+            {user !== null ? <BasicButton className="reply_button" onClick={onReply}>reply</BasicButton>: null}
             
             {/* === 여기서 replyList 표시 === */}
             {replyList.length > 0 ? 
@@ -290,7 +288,7 @@ export default function Tweet({memberName, photo, tweet, boardId, memberId, repl
             :null}
             {/* ========================= */}
 
-            {loginState && replySet ? 
+            {user !== null && replySet ? 
                 <ReplyDiv>
                     {replySet ? <TextArea className="reply_text_box" value={content} onChange={onContent} maxLength={200}></TextArea>: null}
                     {replySet ? <BasicButton className="reply_add_button" onClick={onReplySubmit}>add</BasicButton>: null}

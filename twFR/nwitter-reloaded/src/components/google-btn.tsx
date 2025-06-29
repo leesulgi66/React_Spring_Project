@@ -1,9 +1,10 @@
 import styled from "styled-components"
 import { useNavigate } from "react-router-dom";
+import axiosConfig from "../api/axios"
 
 const Button = styled.span`
-    margin-top: 10px;
-    background-color: #fde500;
+    margin-top: 30px;
+    background-color: #ffffff;
     font-weight: 500;
     width: 100%;
     color: black;
@@ -21,20 +22,20 @@ const Logo = styled.img`
     height: 25px;
 `;
 
-export default function KakaoButton() {
+export default function GoogleButton() {
     const navigate = useNavigate();
     const onClick = async () => {
-        try {
-            console.log("kakao");
-            
-        } catch (error) {
-            console.log(error);
-        }
+        // window.open(
+        //         "http://localhost:8080/oauth2/authorization/google", 
+        //         'oauth2Popup',
+        //         'width=500,height=600'
+        //     );
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
     };
     return (
         <Button onClick={onClick}>
-            <Logo src="/social-img-kakao.png" />
-            Continue with Kakao
+            <Logo src="/social-img-google.png" />
+            Continue with Google
         </Button>
     );
 }
