@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useDispatch, useSelector } from "react-redux";
-import CsrfToken from "../components/csrfTokenGet";
+import CsrfToken from "../api/csrfTokenGet";
 import KakaoButton from "../components/kakao-btn";
 import GoogleButton from "../components/google-btn";
 
@@ -75,6 +75,28 @@ export default function LoginForm() {
             setPassword(value);
         }
     }
+
+    const fetchWithRetry = async (
+        config: any, 
+        retries: number = 2, 
+        delay: number = 500
+    ) => {
+        try {
+            const response = await axiosConfig(config);
+            return response;
+        } catch (error) {
+            if (retries > 0) {
+                CsrfToken().then(token => {
+                    getToken(token);
+                });
+                await new Promise(res => setTimeout(res, delay));
+                return fetchWithRetry(config, retries - 1, delay);
+            } else {
+                throw error;
+            }
+        }
+    };
+
     const onSubmit =async (e : React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if(isLoading || email === "" || password === "") return;
@@ -84,11 +106,11 @@ export default function LoginForm() {
             formData.append("email", email);
             formData.append("password", password);
 
-            const response = await axiosConfig({
+            const response = await fetchWithRetry({
                 url: "/loginApi",
                 method: 'POST',
                 data: formData,
-            });
+            }, 2, 500);
 
             if(response.status === 201) {
                 //console.log("로그인 data : ",response.data); // user id

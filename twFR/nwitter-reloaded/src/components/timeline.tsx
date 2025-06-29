@@ -5,7 +5,7 @@ import axios, { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import CsrfToken from "./csrfTokenGet";
+import CsrfToken from "../api/csrfTokenGet";
 
 export interface ITweet {
     boardId: number;

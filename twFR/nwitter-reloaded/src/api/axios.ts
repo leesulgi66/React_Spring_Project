@@ -1,5 +1,5 @@
 import axios from "axios";
-import CsrfToken from "../components/csrfTokenGet";
+import CsrfToken from "./csrfTokenGet";
 // @ts-ignore
 import store from "../store"
 

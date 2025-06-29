@@ -6,6 +6,7 @@ import 'react-quill/dist/quill.snow.css'
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components"
+import CsrfToken from "../api/csrfTokenGet";
 
 const Form = styled.form`
     display: flex;
@@ -63,6 +64,27 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    const fetchWithRetry = async (
+        config: any, 
+        retries: number = 2, 
+        delay: number = 500
+    ) => {
+        try {
+            const response = await axiosConfig(config);
+            return response;
+        } catch (error) {
+            if (retries > 0) {
+                CsrfToken().then(token => {
+                    dispatch({type: "SET_STRING", payload : token});
+                });
+                await new Promise(res => setTimeout(res, delay));
+                return fetchWithRetry(config, retries - 1, delay);
+            } else {
+                throw error;
+            }
+        }
+    };
+
     const onClick = () => {
         if(user === null) {
             const ok = confirm("글쓰기를 하려면 로그인이 필요합니다. 로그인 하시겠습니까?");
@@ -93,7 +115,11 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             formData.append("user", user);
             formData.append("tweet", tweet);
 
-            const response = await axiosConfig.post("/api/board",formData);
+            const response = await fetchWithRetry({
+                url: "/api/board",
+                method: 'POST',
+                data: formData,
+            }, 2, 500);
 
             if(response.status == 200) {
                 setLoading(false);

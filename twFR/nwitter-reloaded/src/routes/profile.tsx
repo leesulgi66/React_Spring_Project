@@ -111,8 +111,10 @@ export default function Profile() {
     const [page, setPage] = useState<number>(0);
     const [hasMore, setHasMore] = useState<boolean>(true);
     const [loading, setLoading] = useState<boolean>(false);
+    const user = useSelector((state:any)=>state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    console.log(user);
 
     const fetchTweets = async(page = 0) => {
         try{
@@ -160,7 +162,7 @@ export default function Profile() {
     useEffect(() => { // 첫 로딩시 페이지 초기화
         setPage(0);
         setHasMore(true);
-    }, []);
+    }, [user]);
 
     useEffect(() => {
         fetchTweets(page);
@@ -262,10 +264,10 @@ export default function Profile() {
         let okConfirm = false;
         const ok = confirm("계정을 삭제하시겠습니까?");
         if(ok) {okConfirm = confirm("모든 데이터가 삭제됩니다.")};
-        if(!ok || !userInfo || !okConfirm) return;
+        if(!ok || !okConfirm) return;
         try{
+            const logout = await axiosConfig.post("/logout");
             const response = await axiosConfig.delete("/api/user");
-
             if(response.status == 200) {
                 dispatch({type: "SET_USER", payload: null});
                 console.log("del user");
@@ -277,6 +279,9 @@ export default function Profile() {
                 alert("로그인이 필요합니다.");
                 navigate("/login");
             }
+        }finally{
+            dispatch({type: "SET_USER", payload: null});
+            document.cookie = "JSESSIONID" + '=; expires=Thu, 01 Jan 1999 00:00:10 GMT;';
         }
     }
     return (
