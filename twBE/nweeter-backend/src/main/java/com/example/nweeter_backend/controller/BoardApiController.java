@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -82,5 +83,17 @@ public class BoardApiController {
         Long numId = Long.parseLong(id);
         boardService.replyDelete(numId , principal);
         return new ResponseEntity<>("reply delete ok", HttpStatus.OK);
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Controller
+    public class failController {
+        @GetMapping("loginSuccess")
+        public String loginSuccess() {
+            return "forward:/OauthLoginSuccess.html";
+        }
+        @GetMapping("/loginFail")
+        public String loginFail() {
+            return "forward:/OauthLoginFail.html";
+        }
     }
 }
