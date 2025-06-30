@@ -22,13 +22,27 @@ const Logo = styled.img`
 `;
 
 export default function KakaoButton() {
-    const navigate = useNavigate();
+    const BACKEND_ORIGIN = "http://localhost:8080";
     const onClick = async () => {
-        try {
-            window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
-        } catch (error) {
-            console.log(error);
-        }
+        const popup = window.open(
+                "http://localhost:8080/oauth2/authorization/kakao", 
+                'oauth2Popup',
+                'width=500,height=600'
+            );
+
+        const receiveMessage = (event:MessageEvent) => {
+            if(event.origin !== BACKEND_ORIGIN) {
+                return;
+            }
+            if (event.data === "oauth-success") {
+                window.location.href = "/";
+                window.removeEventListener("message", receiveMessage);
+                if (popup) popup.close();
+            }
+        };
+
+        window.addEventListener("message", receiveMessage);
+
     };
     return (
         <Button onClick={onClick}>
