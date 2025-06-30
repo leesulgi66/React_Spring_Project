@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(principalOauth2UserService))
                         .defaultSuccessUrl("http://localhost:5173/")
-                        .failureHandler(customAuthenticationFailureHandler)
+                        .failureUrl("/loginfail")
                         .permitAll()
                 )
         ;

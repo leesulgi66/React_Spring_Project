@@ -1,6 +1,7 @@
 package com.example.nweeter_backend.service;
 
 import com.example.nweeter_backend.auth.PrincipalDetails;
+import com.example.nweeter_backend.auth.provider.OAuth2UserInfo;
 import com.example.nweeter_backend.dto.MemberInfoResponseDto;
 import com.example.nweeter_backend.dto.MemberSignInRequestDto;
 import com.example.nweeter_backend.handler.ImageHandler;
@@ -10,7 +11,7 @@ import com.example.nweeter_backend.repository.MemberRepository;
 import com.example.nweeter_backend.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,24 +50,34 @@ public class MemberService {
     }
 
     @Transactional
-    public Optional<Member> googleSave(OAuth2User oAuth2User, String provider ) {
-        Member member = new Member();
-        String providerId = oAuth2User.getAttribute("sub");
-        String username = provider+"_"+oAuth2User.getAttribute("name");
+    public Member oauthSave(OAuth2UserInfo oAuth2UserInfo) throws OAuth2AuthenticationException {
+        String provider = oAuth2UserInfo.getProvider();
+        String providerId = oAuth2UserInfo.getProvider()+oAuth2UserInfo.getProviderId();
+        String username = oAuth2UserInfo.getName();
         String password = passwordEncoder.encode(providerId);
-        String email = oAuth2User.getAttribute("email");
-        String profileImg = oAuth2User.getAttribute("picture");
+        String email = oAuth2UserInfo.getEmail();
+        String profileImg = oAuth2UserInfo.getProfileImage();
 
-        member.setProvider(provider);
-        member.setProviderId(providerId);
-        member.setUsername(username);
-        member.setPassword(password);
-        member.setEmail(email);
-        member.setProfileImage(profileImg);
-        memberRepository.save(member);
-        System.out.println("board google save ok");
+        Optional<Member> member = memberRepository.findByProviderId(providerId);
 
-        return Optional.of(member);
+        try{
+            if(!memberRepository.existsByEmail(email) && member.isEmpty()){
+                Member saveMember = new Member();
+                saveMember.setProvider(provider);
+                saveMember.setProviderId(providerId);
+                saveMember.setUsername(username);
+                saveMember.setPassword(password);
+                saveMember.setEmail(email);
+                saveMember.setProfileImage(profileImg);
+                memberRepository.save(saveMember);
+                System.out.println("board oauth save ok");
+                return saveMember;
+            }else{
+                return member.get();
+            }
+        }catch (Exception e) {
+            throw new OAuth2AuthenticationException("사용할 수 없는 email 입니다.");
+        }
     }
 
     @Transactional(readOnly = true)
@@ -80,7 +91,7 @@ public class MemberService {
     public void patchMember(MultipartFile file, PrincipalDetails principal) throws IOException {
         Member member = memberRepository.findById(principal.getMember().getId()).orElseThrow(
                 ()-> new IllegalArgumentException("can not find user"));
-        if(member.getProfileImage() != null){
+        if(member.getProfileImageKey() != null){
             imageHandler.deleteFile(member.getProfileImageKey());
         }
         List<String> imgList = imageHandler.save(file, "userImg-"+principal.getMember().getId());
