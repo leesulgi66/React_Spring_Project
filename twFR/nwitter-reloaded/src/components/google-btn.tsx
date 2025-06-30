@@ -23,14 +23,26 @@ const Logo = styled.img`
 `;
 
 export default function GoogleButton() {
-    const navigate = useNavigate();
+    const BACKEND_ORIGIN = "http://localhost:8080";
     const onClick = async () => {
-        // window.open(
-        //         "http://localhost:8080/oauth2/authorization/google", 
-        //         'oauth2Popup',
-        //         'width=500,height=600'
-        //     );
-        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+        const popup = window.open(
+                "http://localhost:8080/oauth2/authorization/google", 
+                'oauth2Popup',
+                'width=500,height=600'
+            );
+        // 팝업이 정상적으로 떴을 때만 polling
+        const receiveMessage = (event:MessageEvent) => {
+            if(event.origin !== BACKEND_ORIGIN) {
+                return;
+            }
+            if (event.data === "oauth-success") {
+                window.location.href = "/";
+                window.removeEventListener("message", receiveMessage);
+                if (popup) popup.close();
+            }
+        };
+
+        window.addEventListener("message", receiveMessage);
     };
     return (
         <Button onClick={onClick}>

@@ -25,8 +25,7 @@ export default function KakaoButton() {
     const navigate = useNavigate();
     const onClick = async () => {
         try {
-            console.log("kakao");
-            
+            window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
         } catch (error) {
             console.log(error);
         }

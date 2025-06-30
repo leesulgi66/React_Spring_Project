@@ -98,7 +98,6 @@ export default function Layout() {
         }catch(e) {
             if(e instanceof AxiosError){
                 console.log(e.message);
-                console.log("login is false")
                 dispatch({type: "SET_USER", payload: null});
             }
         }

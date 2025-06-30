@@ -134,7 +134,14 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
                 navigate("/login");
             }
             if(e instanceof AxiosError && e.status === 500) {
-                alert("이미지와 기타파일의 용량이 너무 큽니다.");
+                if(e?.response?.data === "Maximum upload size exceeded"){
+                    alert("이미지와 기타파일의 용량이 너무 큽니다.");
+                }
+            }
+            if(e instanceof AxiosError){
+                if(e.message === "Network Error"){
+                    alert("서버의 응답이 없습니다.");
+                }
             }
             
         }finally {

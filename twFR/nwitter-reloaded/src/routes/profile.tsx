@@ -266,7 +266,6 @@ export default function Profile() {
         if(ok) {okConfirm = confirm("모든 데이터가 삭제됩니다.")};
         if(!ok || !okConfirm) return;
         try{
-            const logout = await axiosConfig.post("/logout");
             const response = await axiosConfig.delete("/api/user");
             if(response.status == 200) {
                 dispatch({type: "SET_USER", payload: null});
@@ -282,6 +281,7 @@ export default function Profile() {
         }finally{
             dispatch({type: "SET_USER", payload: null});
             document.cookie = "JSESSIONID" + '=; expires=Thu, 01 Jan 1999 00:00:10 GMT;';
+            await axiosConfig.post("/logout");
         }
     }
     return (
