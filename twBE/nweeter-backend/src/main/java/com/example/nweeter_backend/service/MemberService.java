@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -51,9 +52,11 @@ public class MemberService {
 
     @Transactional
     public Member oauthSave(OAuth2UserInfo oAuth2UserInfo) throws OAuth2AuthenticationException {
+        Random rand = new Random();
+        int randomNumber = rand.nextInt(900) + 100;
         String provider = oAuth2UserInfo.getProvider();
         String providerId = oAuth2UserInfo.getProvider()+oAuth2UserInfo.getProviderId();
-        String username = oAuth2UserInfo.getName();
+        String username = provider+"_"+oAuth2UserInfo.getName()+"_"+randomNumber;
         String password = passwordEncoder.encode(providerId);
         String email = oAuth2UserInfo.getEmail();
         String profileImg = oAuth2UserInfo.getProfileImage();

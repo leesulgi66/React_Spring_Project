@@ -87,7 +87,7 @@ public class BoardApiController {
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     @Controller
     public class failController {
-        @GetMapping("loginSuccess")
+        @GetMapping("/loginSuccess")
         public String loginSuccess() {
             return "forward:/OauthLoginSuccess.html";
         }

@@ -37,9 +37,13 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(
-                                "/api/user/signIn",
+                                "/api/user/signUp",
                                 "/api/csrf-token",
-                                "/api/board").permitAll()
+                                "/api/board",
+                                "/loginFail",
+                                "/loginSuccess",
+                                "/OauthLoginFail.html",
+                                "/OauthLoginSuccess.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 //.httpBasic(Customizer.withDefaults())
