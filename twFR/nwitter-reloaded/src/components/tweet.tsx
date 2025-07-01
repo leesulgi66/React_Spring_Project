@@ -21,9 +21,24 @@ const Column = styled.div`
     }
 `;
 
+const UserImage = styled.img`
+    margin-right:5px;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    vertical-align: middle;
+    &.svg{
+        background-color: white;
+    }
+`;
+
 const Username = styled.span`
+    display: inline-block;
+    height: 20px;
+    line-height:20px;
     font-weight: 600;
     font-size: 15px;
+    vertical-align: middle;
 `;
 
 const Payload = styled.div`
@@ -146,7 +161,7 @@ const ReplyDiv = styled.div`
 `;
 
 
-export default function Tweet({memberName, tweet, boardId, memberId, replies ,onTweetPosted}:ITweet) {
+export default function Tweet({memberName, tweet, boardId, photo, memberId, replies ,onTweetPosted}:ITweet) {
     const [content, setContent] = useState("");
     const [changeTweet, setChangeTweet] = useState(tweet);
     const [replyList, setReplyList] = useState<IReply[]>(replies); 
@@ -271,6 +286,7 @@ export default function Tweet({memberName, tweet, boardId, memberId, replies ,on
 
     return (<Wrapper isMyself={isMyself}>
         <Column>
+            {photo !== null ? <UserImage src={photo} /> : <UserImage className="svg" src="/UserCircle.svg" />}
             <Username>{memberName}</Username>
             {boardSet ? <StyledQuill value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
             <Payload dangerouslySetInnerHTML={{ __html: cleanHtml }}></Payload>}
