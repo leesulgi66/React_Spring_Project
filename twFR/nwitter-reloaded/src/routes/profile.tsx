@@ -114,7 +114,6 @@ export default function Profile() {
     const user = useSelector((state:any)=>state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    console.log(user);
 
     const fetchTweets = async(page = 0) => {
         try{
@@ -294,7 +293,7 @@ export default function Profile() {
             </AvatarUpload>
             <AvatarInput onChange={onAvatarCahange} id="avatar" type="file" accept="image/*"/>
             <Name>
-                {isEditing ? <TextArea onChange={onChange} rows={1} maxLength={20} onKeyDown={handleKeyPress} value={inputText as string} required /> : userInfo?.username || "Anonymous"}
+                {isEditing ? <TextArea onChange={onChange} rows={1} maxLength={12} onKeyDown={handleKeyPress} value={inputText as string} required /> : userInfo?.username || "Anonymous"}
                 <EditButton>
                     {isEditing ? <svg onClick={onEdit} fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
