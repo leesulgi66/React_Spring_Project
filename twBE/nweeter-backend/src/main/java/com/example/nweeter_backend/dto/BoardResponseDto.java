@@ -19,5 +19,6 @@ public class BoardResponseDto {
     private LocalDateTime insertTime;
     private LocalDateTime updateTime;
     private String memberName;
+    private String photo;
     private List<ReplyResponseDto> replies;
 }

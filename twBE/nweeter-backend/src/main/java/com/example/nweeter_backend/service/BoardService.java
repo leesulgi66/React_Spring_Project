@@ -85,6 +85,7 @@ public class BoardService {
                 BoardResponseDto.builder()
                         .boardId(p.getId())
                         .tweet(p.getTweet())
+                        .photo(p.getMember().getProfileImage())
                         .memberId(p.getMember().getId())
                         .memberName(p.getMember().getUsername())
                         .insertTime(p.getInsertTime())
