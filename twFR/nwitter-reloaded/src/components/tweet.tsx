@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { ITweet, IReply } from "./timeline";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import axios, { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useDispatch, useSelector } from "react-redux";
@@ -8,6 +8,7 @@ import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css'
 import DOMPurify from 'dompurify';
 import Reply from "./reply";
+import ReactQuillTextBox from "./quill-text-box";
 
 const Wrapper = styled.div<{isMyself:boolean}>`
     padding: 20px;
@@ -117,35 +118,6 @@ const TextArea = styled.textarea`
     }
 `;
 
-const StyledQuill = styled(ReactQuill)`
-    margin: 5px 0;
-    .ql-container {
-        border-bottom-left-radius: 10px;
-        border-bottom-right-radius: 10px;
-    }
-    .ql-toolbar {
-        background-color: #b2e0ff;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-    }
-    .ql-editor {
-        font-family: 'CookieRun', sans-serif;
-        min-height: 120px;
-        font-size: 1.2em;
-        //강제 줄바꿈
-        white-space: normal;
-        word-break: break-all; 
-        overflow-wrap: break-word; 
-        word-wrap: break-word; 
-        &:focus {
-            border: solid 1px;
-            border-color: #1d9bf0;
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-        }
-    }
-`;
-
 const ReplyDiv = styled.div`
     display: flex;
     height: 6vh;
@@ -159,7 +131,6 @@ const ReplyDiv = styled.div`
     color: #888;
     }
 `;
-
 
 export default function Tweet({memberName, tweet, boardId, photo, memberId, replies ,onTweetPosted}:ITweet) {
     const [content, setContent] = useState("");
@@ -269,26 +240,17 @@ export default function Tweet({memberName, tweet, boardId, photo, memberId, repl
         setReplyList(replies);
     }, [replies]);
 
-    const modules = {
-        toolbar: [
-            [{ 'header': [1, 2, false] }],
-            ['bold', 'italic', 'underline','strike', 'blockquote'],
-            ['link', 'image', 'video'],
-            ['clean']
-        ],
-    };
-
     const cleanHtml = DOMPurify.sanitize(tweet, {
-        ADD_TAGS: ["iframe"],
-        ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "src", "height", "width"],
-        ALLOWED_URI_REGEXP: /^https?:\/\/(www\.youtube\.com|youtube\.com|player\.vimeo\.com)\//,
+        ADD_TAGS: ["iframe", "img"],
+        ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "src", "height", "width", "alt", "style"],
+        ALLOWED_URI_REGEXP: /^(https?:\/\/(?:www\.)?(?:youtube\.com|vimeo\.com)\/|http:\/\/(?:localhost|127\.0\.0\.1):8080\/images\/)/
     });
 
     return (<Wrapper isMyself={isMyself}>
         <Column>
             {photo !== null ? <UserImage src={photo} /> : <UserImage className="svg" src="/UserCircle.svg" />}
             <Username>{memberName}</Username>
-            {boardSet ? <StyledQuill value={changeTweet} onChange={setChangeTweet} modules={modules} theme="snow"/>:
+            {boardSet ? <ReactQuillTextBox tweetValue={changeTweet}  tweetChange={setChangeTweet}/>:
             <Payload dangerouslySetInnerHTML={{ __html: cleanHtml }}></Payload>}
             {isMyself ? <BasicButton onClick={onDelete}>Delete</BasicButton> : null}
             {isMyself ? boardSet ? <BasicButton className="cancelBtn" onClick={onEdit}>cancel</BasicButton> :<BasicButton onClick={onEdit}>Edit</BasicButton> : null}
