@@ -12,9 +12,9 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query(value = "SELECT * FROM board WHERE member_id = ?1",nativeQuery = true)
     Page<Board> boards(Long member_id, Pageable pageable);
 
-    @Modifying // delete, update 등에 붙여주어야 한다.
+    @Modifying(clearAutomatically = true) // delete, update 등에 붙여주어야 한다.
     @Transactional
     @Query(value = "DELETE FROM board WHERE member_id = ?1",nativeQuery = true)
-    int boards(Long member_id);
+    int delBoards(Long member_id);
     //void deleteAllByMember(Member member); // 위와 같음
 }

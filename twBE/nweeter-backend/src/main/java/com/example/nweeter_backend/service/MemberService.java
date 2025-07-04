@@ -115,13 +115,14 @@ public class MemberService {
 
     @Transactional
     public void deleteMember(PrincipalDetails principal) {
-        Member member = principal.getMember();
+        Member member = memberRepository.findById(principal.getMember().getId()).orElseThrow(
+                ()-> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
         replyRepository.deleteByMember(member);
-        int boards = boardRepository.boards(member.getId());
+        int boards = boardRepository.delBoards(member.getId());
         System.out.println("delete boards count : " + boards);
-        if(member.getProfileImageKey() != null){
+        if(!member.getProfileImageKey().isEmpty()){
             imageHandler.deleteFile(member.getProfileImageKey());
         }
-        memberRepository.delete(member);
+        memberRepository.deleteById(member.getId());
     }
 }
