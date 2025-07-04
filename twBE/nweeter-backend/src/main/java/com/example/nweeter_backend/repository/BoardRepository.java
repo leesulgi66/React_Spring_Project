@@ -1,7 +1,6 @@
 package com.example.nweeter_backend.repository;
 
 import com.example.nweeter_backend.modle.Board;
-import com.example.nweeter_backend.modle.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

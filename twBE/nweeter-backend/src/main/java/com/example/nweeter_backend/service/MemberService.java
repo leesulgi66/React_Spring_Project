@@ -25,11 +25,11 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-    private final MemberRepository memberRepository;
-    private final BoardRepository boardRepository;
-    private final ReplyRepository replyRepository;
-    private final ImageHandler imageHandler;
-    private final BCryptPasswordEncoder passwordEncoder;
+    final private MemberRepository memberRepository;
+    final private BoardRepository boardRepository;
+    final private ReplyRepository replyRepository;
+    final private ImageHandler imageHandler;
+    final private BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
     public void save(MemberSignInRequestDto member) throws IOException {
@@ -119,6 +119,9 @@ public class MemberService {
         replyRepository.deleteByMember(member);
         int boards = boardRepository.boards(member.getId());
         System.out.println("delete boards count : " + boards);
+        if(member.getProfileImageKey() != null){
+            imageHandler.deleteFile(member.getProfileImageKey());
+        }
         memberRepository.delete(member);
     }
 }

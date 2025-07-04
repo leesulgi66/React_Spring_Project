@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(
+                                "images/**",
                                 "/api/user/signUp",
                                 "/api/csrf-token",
                                 "/api/board",

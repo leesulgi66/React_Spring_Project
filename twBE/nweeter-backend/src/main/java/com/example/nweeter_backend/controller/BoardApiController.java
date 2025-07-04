@@ -1,6 +1,7 @@
 package com.example.nweeter_backend.controller;
 
 import com.example.nweeter_backend.auth.PrincipalDetails;
+import com.example.nweeter_backend.dto.BoardImageResponseDto;
 import com.example.nweeter_backend.dto.BoardRequestDto;
 import com.example.nweeter_backend.dto.BoardResponseDto;
 import com.example.nweeter_backend.dto.ReplyRequestDto;
@@ -16,9 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -29,15 +32,6 @@ public class BoardApiController {
     @Autowired
     public BoardApiController(BoardService boardService) {
         this.boardService = boardService;
-    }
-
-    @PostMapping("/board")
-    public ResponseEntity<String> boardPost(@ModelAttribute BoardRequestDto dto, @AuthenticationPrincipal PrincipalDetails principal) throws IOException {
-        log.info("board post call");
-        int byteSize = dto.getTweet().getBytes(StandardCharsets.UTF_8).length;
-        System.out.println("tweet size : "+byteSize);
-        boardService.save(dto, principal.getMember());
-        return new ResponseEntity<>("board save ok", HttpStatus.OK);
     }
 
     @GetMapping("/board")
@@ -54,11 +48,11 @@ public class BoardApiController {
         return new ResponseEntity<>(allBoards, HttpStatus.OK);
     }
 
-    @DeleteMapping ("/board/{id}")
-    public ResponseEntity<String> boardDelete(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails principal) throws IOException {
-        log.info("board delete call");
-        boardService.delete(id);
-        return new ResponseEntity<>("board delete ok", HttpStatus.OK);
+    @PostMapping("/board")
+    public ResponseEntity<String> boardPost(@ModelAttribute BoardRequestDto dto, @AuthenticationPrincipal PrincipalDetails principal) throws IOException {
+        log.info("board post call");
+        boardService.save(dto, principal.getMember());
+        return new ResponseEntity<>("board save ok", HttpStatus.OK);
     }
 
     @PutMapping("/board")
@@ -68,6 +62,13 @@ public class BoardApiController {
         dto.setId(num);
         boardService.edit(dto, principal.getMember());
         return new ResponseEntity<>("edit ok", HttpStatus.OK);
+    }
+
+    @DeleteMapping ("/board/{id}")
+    public ResponseEntity<String> boardDelete(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails principal) throws IOException {
+        log.info("board delete call");
+        boardService.delete(id, principal);
+        return new ResponseEntity<>("board delete ok", HttpStatus.OK);
     }
 
     @PostMapping("/reply")
@@ -84,6 +85,20 @@ public class BoardApiController {
         boardService.replyDelete(numId , principal);
         return new ResponseEntity<>("reply delete ok", HttpStatus.OK);
     }
+
+    @PostMapping("/images/upload")
+    public ResponseEntity<BoardImageResponseDto> imageUpload(@RequestParam(value = "image") MultipartFile file) throws IOException {
+        log.info("image upload call");
+        BoardImageResponseDto dto = boardService.boardImageSave(file);
+        return new ResponseEntity<BoardImageResponseDto>(dto , HttpStatus.OK);
+    }
+
+    @GetMapping("/board/images")
+    public ResponseEntity<String> imageDelete() {
+        boardService.imageDeleteTest();
+        return new ResponseEntity<String>("delete ok", HttpStatus.OK);
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     @Controller
     public class failController {

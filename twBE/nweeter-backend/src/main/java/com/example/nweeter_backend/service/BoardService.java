@@ -1,22 +1,24 @@
 package com.example.nweeter_backend.service;
 
 import com.example.nweeter_backend.auth.PrincipalDetails;
-import com.example.nweeter_backend.dto.BoardRequestDto;
-import com.example.nweeter_backend.dto.BoardResponseDto;
-import com.example.nweeter_backend.dto.ReplyRequestDto;
-import com.example.nweeter_backend.dto.ReplyResponseDto;
+import com.example.nweeter_backend.dto.*;
+import com.example.nweeter_backend.handler.ImageHandler;
 import com.example.nweeter_backend.modle.Board;
+import com.example.nweeter_backend.modle.ImageInBoard;
 import com.example.nweeter_backend.modle.Member;
 import com.example.nweeter_backend.modle.Reply;
 import com.example.nweeter_backend.repository.BoardRepository;
+import com.example.nweeter_backend.repository.ImageInBoardRepository;
 import com.example.nweeter_backend.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -26,6 +28,8 @@ public class BoardService {
 
     final private BoardRepository boardRepository;
     final private ReplyRepository replyRepository;
+    final private ImageInBoardRepository imageInBoardRepository;
+    final private ImageHandler imageHandler;
 
     @Transactional
     public void save(BoardRequestDto dto, Member member) throws IOException {
@@ -33,6 +37,16 @@ public class BoardService {
         board.setMember(member);
         board.setTweet(dto.getTweet());
         boardRepository.save(board);
+        //image file state change
+        if(dto.getImageIds() != null){
+            System.out.println(dto.getImageIds());
+            for(String id : dto.getImageIds()) {
+                Long num = Long.parseLong(id);
+                ImageInBoard IIB = imageInBoardRepository.getReferenceById(num);
+                IIB.setState(ImageInBoard.State.CONFIRMED);
+                IIB.setBoardId(board.getId());
+            }
+        }
         System.out.println("board save ok");
     }
 
@@ -54,14 +68,33 @@ public class BoardService {
         if(!Objects.equals(board.getMember().getId(), member.getId())) {
             throw new IOException("not equal user");
         }
-        board.setMember(member);
         board.setTweet(dto.getTweet());
         boardRepository.save(board);
+        //image file state change
+        if(dto.getImageIds() != null){
+            System.out.println(dto.getImageIds());
+            for(String id : dto.getImageIds()) {
+                Long num = Long.parseLong(id);
+                ImageInBoard IIB = imageInBoardRepository.getReferenceById(num);
+                IIB.setState(ImageInBoard.State.CONFIRMED);
+                IIB.setBoardId(board.getId());
+            }
+        }
         System.out.println("board update ok");
     }
 
-    public void delete(Long id) {
-        boardRepository.deleteById(id);
+    public void delete(Long id, PrincipalDetails principal) {
+        Board board = boardRepository.getReferenceById(id);
+        if(board.getMember().getId().equals(principal.getMember().getId())){
+            List<ImageInBoard> list = imageInBoardRepository.findAllByBoardId(id);
+            if(!list.isEmpty()){
+                for(ImageInBoard image : list) {
+                    imageHandler.deleteFile(image.getImageLocation());
+                    imageInBoardRepository.delete(image);
+                }
+            }
+            boardRepository.deleteById(id);
+        }
     }
 
     @Transactional
@@ -77,7 +110,37 @@ public class BoardService {
 
     @Transactional
     public void replyDelete(Long id, PrincipalDetails principal) {
-        replyRepository.deleteById(id);
+        Reply reply = replyRepository.getReferenceById(id);
+        if(reply.getMember().getId().equals(principal.getMember().getId())){
+            replyRepository.deleteById(id);
+        }
+    }
+
+    @Transactional
+    public BoardImageResponseDto boardImageSave(MultipartFile file) throws IOException {
+        BoardImageResponseDto dto = new BoardImageResponseDto();
+        ImageInBoard IIB = new ImageInBoard();
+        List<String> list = imageHandler.save(file, "boardImg");
+        IIB.setImageUrl(list.get(0));
+        IIB.setImageLocation(list.get(1));
+        IIB.setState(ImageInBoard.State.PENDING);
+        IIB = imageInBoardRepository.save(IIB);
+
+        dto.setImageUrl(IIB.getImageUrl());
+        dto.setImageLocation(IIB.getImageLocation());
+        dto.setImageId(IIB.getId());
+
+        return dto;
+    }
+
+    public void imageDeleteTest() {
+        List<ImageInBoard> list = imageInBoardRepository.findAllByState(ImageInBoard.State.PENDING);
+        for(ImageInBoard image : list) {
+            String delLocation = image.getImageLocation();
+            imageHandler.deleteFile(delLocation);
+            imageInBoardRepository.delete(image);
+        }
+        System.out.println(list);
     }
 
     private Page<BoardResponseDto> boardResponseDto(Page<Board> boards) {
