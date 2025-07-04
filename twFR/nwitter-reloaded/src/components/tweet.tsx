@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import axios, { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useDispatch, useSelector } from "react-redux";
-import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css'
 import DOMPurify from 'dompurify';
 import Reply from "./reply";
@@ -137,6 +136,7 @@ export default function Tweet({memberName, tweet, boardId, photo, memberId, repl
     const [changeTweet, setChangeTweet] = useState(tweet);
     const [replyList, setReplyList] = useState<IReply[]>(replies); 
     const [file, setFile] = useState<File|null>(null);
+    const [uploadedImageIds, setUploadedImageIds] = useState<number[]>([]);
     const dispatch = useDispatch();
     const user = useSelector((state:any)=>state.user);
     const replySet = useSelector((state:any)=>state.replyEdit === boardId);
@@ -175,6 +175,8 @@ export default function Tweet({memberName, tweet, boardId, photo, memberId, repl
             formData.append("boardId", boardId.toString());
             formData.append("user", user);
             formData.append("tweet", changeTweet);
+            uploadedImageIds.forEach(image => {formData.append("imageIds", image.toString())});
+
             if(file !== null){
                 formData.append("file", file);
             }
@@ -219,6 +221,10 @@ export default function Tweet({memberName, tweet, boardId, photo, memberId, repl
         }
     }
 
+    const handleDataFromChild = (data:number[]) => {
+        setUploadedImageIds(()=>data);
+    }
+
     const onEdit = () => {
         if(user !== memberId) return;
         dispatch({type: "BOARD_EDIT", payload: boardId});
@@ -250,7 +256,7 @@ export default function Tweet({memberName, tweet, boardId, photo, memberId, repl
         <Column>
             {photo !== null ? <UserImage src={photo} /> : <UserImage className="svg" src="/UserCircle.svg" />}
             <Username>{memberName}</Username>
-            {boardSet ? <ReactQuillTextBox tweetValue={changeTweet}  tweetChange={setChangeTweet}/>:
+            {boardSet ? <ReactQuillTextBox tweetValue={changeTweet}  tweetChange={setChangeTweet} onSendData={handleDataFromChild} />:
             <Payload dangerouslySetInnerHTML={{ __html: cleanHtml }}></Payload>}
             {isMyself ? <BasicButton onClick={onDelete}>Delete</BasicButton> : null}
             {isMyself ? boardSet ? <BasicButton className="cancelBtn" onClick={onEdit}>cancel</BasicButton> :<BasicButton onClick={onEdit}>Edit</BasicButton> : null}

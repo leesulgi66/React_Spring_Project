@@ -1,7 +1,6 @@
 import axios, { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
-import React, { useMemo, useRef, useState } from "react";
-import ReactQuill from "react-quill";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import 'react-quill/dist/quill.snow.css'
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -33,7 +32,7 @@ const SubmitBtn = styled.input`
 export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => void }) {
     const [isLoading, setLoading] = useState(false);
     const [tweet, setTweet] = useState("");
-    const [uploadedImageLocations, setUploadedImageLocations] = useState<string[]>([]);
+    const [uploadedImageIds, setUploadedImageIds] = useState<number[]>([]);
     const user = useSelector((state:any) => state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -76,6 +75,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             const formData = new FormData();
             formData.append("user", user);
             formData.append("tweet", tweet);
+            uploadedImageIds.forEach(image => {formData.append("imageIds", image.toString())});
 
             const response = await fetchWithRetry({
                 url: "/api/board",
@@ -86,8 +86,9 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
             if(response.status == 200) {
                 setLoading(false);
                 onTweetPosted();
+                setTweet("");
+                setUploadedImageIds([]);
             }
-            setTweet("");
         }catch(e){  
             console.log(e);
             if(e instanceof AxiosError && e.status === 401) {
@@ -111,11 +112,14 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
         }
     }
 
+    const handleDataFromChild = (data:number[]) => {
+        setUploadedImageIds(()=>data);
+    }
+
     return (
     <Form onSubmit={onSubmit}>
         <div>
-            {/* <StyledQuill className="quill_text_box" ref={quillRef} value={tweet} onChange={setTweet} modules={modules} theme="snow"/> */}
-            <ReactQuillTextBox tweetValue={tweet}  tweetChange={setTweet}/>
+            <ReactQuillTextBox tweetValue={tweet}  tweetChange={setTweet} onSendData={handleDataFromChild}/>
         </div>
         <SubmitBtn type="submit" value={isLoading ? "Posting..." : "Post Memo"}/>
     </Form>

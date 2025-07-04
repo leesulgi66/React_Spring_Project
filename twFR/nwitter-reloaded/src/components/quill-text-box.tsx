@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import styled from "styled-components";
 import axiosConfig from "../api/axios"
@@ -41,7 +41,8 @@ const parseYoutubeUrl = (url: string): string | null => {
   return match ? match[1] : null;
 };
 
-export default function ReactQuillTextBox({ tweetValue , tweetChange }:{ tweetValue: string , tweetChange: React.Dispatch<React.SetStateAction<string>>}) {
+export default function ReactQuillTextBox({ tweetValue , tweetChange, onSendData }:{ tweetValue: string , tweetChange: React.Dispatch<React.SetStateAction<string>>, onSendData : (data: number[]) => void}) {
+    const [uploadedImageIds, setUploadedImageIds] = useState<number[]>([]);
     const quillRef = useRef<ReactQuill>(null);
     const user = useSelector((state:any) => state.user);
     const navigate = useNavigate();
@@ -129,7 +130,12 @@ export default function ReactQuillTextBox({ tweetValue , tweetChange }:{ tweetVa
                     });
 
                     // 4. 성공 시, 서버에서 받은 이미지 URL을 에디터에 삽입
-                    const {imageUrl, imageLocation, imageId} = response.data;
+                    const {imageUrl, imageId} = response.data;
+                    setUploadedImageIds(prevIds => {
+                        const newIds = [...prevIds, imageId];
+                        onSendData(newIds);
+                        return newIds;
+                    });
                     
                     // 5. 로딩 표시 삭제 및 이미지 삽입
                     quill.deleteText(range.index, '이미지 업로드 중...'.length); // 로딩 텍스트 삭제
