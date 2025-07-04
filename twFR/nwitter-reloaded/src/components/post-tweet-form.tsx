@@ -81,7 +81,7 @@ export default function PostTweetForm({ onTweetPosted }: { onTweetPosted: () => 
                 url: "/api/board",
                 method: 'POST',
                 data: formData,
-            }, 2, 500);
+            }, 2, 300);
 
             if(response.status == 200) {
                 setLoading(false);

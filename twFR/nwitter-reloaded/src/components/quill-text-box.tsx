@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
-import ReactQuill from "react-quill";
+import ReactQuill, { Quill } from "react-quill";
+import ImageResize from 'quill-image-resize-module-react';
 import styled from "styled-components";
 import axiosConfig from "../api/axios"
 import { useSelector } from "react-redux";
@@ -40,6 +41,9 @@ const parseYoutubeUrl = (url: string): string | null => {
   const match = url.match(regex);
   return match ? match[1] : null;
 };
+
+// Quill에 리사이즈 모듈을 등록합니다. 컴포넌트 외부에 위치시켜 한 번만 실행되도록 합니다.
+Quill.register('modules/imageResize', ImageResize);
 
 export default function ReactQuillTextBox({ tweetValue , tweetChange, onSendData }:{ tweetValue: string , tweetChange: React.Dispatch<React.SetStateAction<string>>, onSendData : (data: number[]) => void}) {
     const [uploadedImageIds, setUploadedImageIds] = useState<number[]>([]);
@@ -186,7 +190,17 @@ export default function ReactQuillTextBox({ tweetValue , tweetChange, onSendData
                         return delta;
                     }]
                 ]
-            }
+            },
+            imageResize: {
+                parchment: Quill.import('parchment'),
+                modules: ['Resize', 'DisplaySize'],
+                // ⭐️ 이 handleStyles 옵션을 추가합니다.
+                handleStyles: {
+                    backgroundColor: 'none',
+                    border: 'none',
+                    color: 'none'
+                }
+            },
         };
     }, []);
 

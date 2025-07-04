@@ -4,7 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import KakaoButton from "../components/kakao-btn";
 import axios, { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import CsrfToken from "../api/csrfTokenGet";
 
 const Wrapper = styled.div`
     height: 100%;
@@ -64,6 +65,7 @@ export default function CreateAccount() {
     const [password, setPassword] = useState("");
     const [passwordCheck, setPasswordCheck] = useState("");
     const [error, setError] = useState("");
+    const dispatch = useDispatch();
 
     const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
         const {target: { name, value }} = e;
@@ -77,6 +79,28 @@ export default function CreateAccount() {
             setPasswordCheck(value);
         }
     }
+
+    const fetchWithRetry = async (
+        config: any, 
+        retries: number = 2, 
+        delay: number = 500
+    ) => {
+        try {
+            const response = await axiosConfig(config);
+            return response;
+        } catch (error) {
+            if (retries > 0) {
+                CsrfToken().then(token => {
+                    dispatch({type: "SET_STRING", payload : token});
+                });
+                await new Promise(res => setTimeout(res, delay));
+                return fetchWithRetry(config, retries - 1, delay);
+            } else {
+                throw error;
+            }
+        }
+    };
+
     const onSubmit =async (e : React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError("");
@@ -90,14 +114,15 @@ export default function CreateAccount() {
             return;
         }
         try{
-            const response = await axiosConfig.post("/api/user/signUp", 
-                {
+            const response = await fetchWithRetry({
+                url: "/api/user/signUp",
+                method: 'POST',
+                data: {
                     username,
                     password,
                     email               
-                }
-            );
-            
+                },
+            }, 2, 300);
             console.log(response);
 
             if(response.status == 200) {

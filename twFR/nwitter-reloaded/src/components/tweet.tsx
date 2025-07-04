@@ -247,9 +247,10 @@ export default function Tweet({memberName, tweet, boardId, photo, memberId, repl
     }, [replies]);
 
     const cleanHtml = DOMPurify.sanitize(tweet, {
-        ADD_TAGS: ["iframe", "img"],
-        ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "src", "height", "width", "alt", "style"],
-        ALLOWED_URI_REGEXP: /^(https?:\/\/(?:www\.)?(?:youtube\.com|vimeo\.com)\/|http:\/\/(?:localhost|127\.0\.0\.1):8080\/images\/)/
+        ALLOW_UNKNOWN_PROTOCOLS: true,
+        ADD_TAGS: ["iframe", "img", "style"],
+        ADD_ATTR: ["height", "width", "allow", "allowfullscreen", "frameborder", "scrolling", "src", "alt", "style"],
+        ALLOWED_URI_REGEXP: /^(https?:\/\/(?:www\.)?(?:youtube\.com|vimeo\.com)\/|http:\/\/(?:localhost|127\.0\.0\.1):8080\/images\/)/,
     });
 
     return (<Wrapper isMyself={isMyself}>
