@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export default function ProtectedRoute({children} : {children:React.ReactNode}) {

@@ -1,9 +1,9 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import axios, { AxiosError } from "axios";
+import  { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const Wrapper = styled.div`
     display: grid;

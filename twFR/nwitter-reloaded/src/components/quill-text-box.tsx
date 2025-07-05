@@ -140,6 +140,8 @@ export default function ReactQuillTextBox({ tweetValue , tweetChange, onSendData
                         onSendData(newIds);
                         return newIds;
                     });
+
+                    console.log(uploadedImageIds);
                     
                     // 5. 로딩 표시 삭제 및 이미지 삽입
                     quill.deleteText(range.index, '이미지 업로드 중...'.length); // 로딩 텍스트 삭제

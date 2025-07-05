@@ -30,7 +30,7 @@ const Username = styled.p<{isMyself:boolean}>`
     color:${props => props.isMyself ? '#ffffc1' : 'white'};
 `;
 
-export default function Reply({ id, boardId , memberId, boardMemberId, insertTime, updateTime, memberName, content, onTweetPosted }:IReply) {
+export default function Reply({ id, memberId, boardMemberId, memberName, content, onTweetPosted }:IReply) {
     const [myContent, setMyContent] = useState(content);
     const user = useSelector((state:any)=>state.user);
     const isMyself = user === memberId;
