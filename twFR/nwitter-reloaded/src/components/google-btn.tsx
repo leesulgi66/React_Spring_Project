@@ -21,10 +21,10 @@ const Logo = styled.img`
 `;
 
 export default function GoogleButton() {
-    const BACKEND_ORIGIN = "http://localhost:8080";
+    const BACKEND_ORIGIN = "http://119.201.41.172:8080";
     const onClick = async () => {
         const popup = window.open(
-                "http://localhost:8080/oauth2/authorization/google", 
+                "http://119.201.41.172:8080/oauth2/authorization/google", 
                 'oauth2Popup',
                 'width=500,height=600'
             );
