@@ -23,6 +23,7 @@ instance.interceptors.request.use(
     }
     
     if(csrfToken) {
+      console.log(csrfToken);
       config.headers["X-CSRF-TOKEN"] = csrfToken;
     }return config;
   }

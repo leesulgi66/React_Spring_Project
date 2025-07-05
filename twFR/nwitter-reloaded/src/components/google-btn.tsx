@@ -24,7 +24,7 @@ export default function GoogleButton() {
     const BACKEND_ORIGIN = "http://119.201.41.172:18080";
     const onClick = async () => {
         const popup = window.open(
-                "http://119.201.41.172:8080/oauth2/authorization/google", 
+                "http://waduck.duckdns.org:18080/oauth2/authorization/google", 
                 'oauth2Popup',
                 'width=500,height=600'
             );
