@@ -1,7 +1,7 @@
 
 import { legacy_createStore as createStore } from "redux"
 
-function reducer(currentState, action) {
+function reducer(currentState:any, action:any) {
     if(currentState === undefined) {
         return {
             csrfToken: null,
