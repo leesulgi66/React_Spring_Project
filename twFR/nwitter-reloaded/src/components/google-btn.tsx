@@ -21,16 +21,17 @@ const Logo = styled.img`
 `;
 
 export default function GoogleButton() {
-    const BACKEND_ORIGIN = "http://119.201.41.172:18080";
+    const baseUrl = import.meta.env.VITE_SERVER_URL;
     const onClick = async () => {
+        console.log(baseUrl);
         const popup = window.open(
-                "http://waduck.duckdns.org:18080/oauth2/authorization/google", 
+                baseUrl+"/oauth2/authorization/google", 
                 'oauth2Popup',
                 'width=500,height=600'
             );
         // 팝업이 정상적으로 떴을 때만 polling
         const receiveMessage = (event:MessageEvent) => {
-            if(event.origin !== BACKEND_ORIGIN) {
+            if(event.origin !== baseUrl) {
                 return;
             }
             if (event.data === "oauth-success") {

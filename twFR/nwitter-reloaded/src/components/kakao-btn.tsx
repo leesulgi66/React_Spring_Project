@@ -21,16 +21,16 @@ const Logo = styled.img`
 `;
 
 export default function KakaoButton() {
-    const BACKEND_ORIGIN = "http://119.201.41.172:18080";
+    const baseUrl = import.meta.env.VITE_SERVER_URL;
     const onClick = async () => {
         const popup = window.open(
-                "http://waduck.duckdns.org:18080/oauth2/authorization/kakao", 
+                baseUrl+"/oauth2/authorization/kakao", 
                 'oauth2Popup',
                 'width=500,height=600'
             );
 
         const receiveMessage = (event:MessageEvent) => {
-            if(event.origin !== BACKEND_ORIGIN) {
+            if(event.origin !== baseUrl) {
                 return;
             }
             if (event.data === "oauth-success") {
