@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Tweet from "./tweet";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import CsrfToken from "../api/csrfTokenGet";
+import { useDispatch } from "react-redux";
 
 export interface ITweet {
     boardId: number;
@@ -27,6 +25,7 @@ export interface IReply {
     id : number;
     boardId : number;
     memberId: number;
+    boardMemberId: number;
     insertTime: number;
     updateTime: number;
     memberName: string;

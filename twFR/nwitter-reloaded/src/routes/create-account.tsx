@@ -2,10 +2,11 @@ import { useState } from "react";
 import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom";
 import KakaoButton from "../components/kakao-btn";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import CsrfToken from "../api/csrfTokenGet";
+import GoogleButton from "../components/google-btn";
 
 const Wrapper = styled.div`
     height: 100%;
@@ -18,6 +19,7 @@ const Wrapper = styled.div`
 
 const Title = styled.h1`
     font-size: 42px;
+    cursor: pointer;
 `;
 
 const Form = styled.form`
@@ -140,9 +142,13 @@ export default function CreateAccount() {
             setLoading(false);
         }
     }
+
+    const onClick = ()=>{
+        navigate('/login');
+    }
     return (
         <Wrapper>
-            <Title>Join X</Title>
+            <Title onClick={onClick}>Join X</Title>
             <Form onSubmit={onSubmit}>
                 <Input onChange={onChange} name="username" value={username} placeholder="Name" type="text" required/>
                 <Input onChange={onChange} name="email" value={email} placeholder="Email" type="email" required/>
@@ -154,6 +160,7 @@ export default function CreateAccount() {
             <Switcher>
                 Already have an account? <Link to="/login">Log in &rarr;</Link>
             </Switcher>
+            <GoogleButton />
             <KakaoButton />
         </Wrapper>
     )

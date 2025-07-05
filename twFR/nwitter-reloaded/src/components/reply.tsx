@@ -30,10 +30,11 @@ const Username = styled.p<{isMyself:boolean}>`
     color:${props => props.isMyself ? '#ffffc1' : 'white'};
 `;
 
-export default function Reply({ id, boardId , memberId, insertTime, updateTime, memberName, content, onTweetPosted }:IReply) {
+export default function Reply({ id, boardId , memberId, boardMemberId, insertTime, updateTime, memberName, content, onTweetPosted }:IReply) {
     const [myContent, setMyContent] = useState(content);
     const user = useSelector((state:any)=>state.user);
     const isMyself = user === memberId;
+    const writer = memberId === boardMemberId;
 
     const onDelete = async() => {
         const ok = confirm("Are you sure you want to delete?");
@@ -56,7 +57,7 @@ export default function Reply({ id, boardId , memberId, insertTime, updateTime, 
     return(
         <Wrapper>
             <Column>
-                └{isMyself ? <p>💙</p>:null}<Username isMyself={isMyself}>{memberName}</Username><p id="comma">:</p><p>{myContent}</p>
+                └{writer ? <p>🏠</p>:null}<Username isMyself={isMyself}>{memberName}</Username><p id="comma">:</p><p>{myContent}</p>
                 {isMyself ? <p onClick={onDelete} className="right_del">✖</p> : null}
             </Column>
         </Wrapper>

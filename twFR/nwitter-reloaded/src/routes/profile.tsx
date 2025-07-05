@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { ITweet } from "../components/timeline";
 import Tweet from "../components/tweet";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -110,7 +110,6 @@ export default function Profile() {
     const [profileUpdate, setProfileUpdate] = useState(false);
     const [page, setPage] = useState<number>(0);
     const [hasMore, setHasMore] = useState<boolean>(true);
-    const [loading, setLoading] = useState<boolean>(false);
     const user = useSelector((state:any)=>state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -170,13 +169,13 @@ export default function Profile() {
     useEffect(() => { // 스크롤 인식
         const handleScroll = () => {
             const {scrollTop, scrollHeight, clientHeight} = document.documentElement;
-            if (scrollTop + clientHeight >= scrollHeight - 100 && hasMore && !loading) {
+            if (scrollTop + clientHeight >= scrollHeight - 100 && hasMore) {
                 setPage(prev => prev + 1); // 다음 페이지로
             }
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [hasMore, loading]);
+    }, [hasMore]);
 
     const onAvatarCahange = async (e:React.ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;

@@ -1,6 +1,4 @@
 import styled from "styled-components"
-import { useNavigate } from "react-router-dom";
-import axiosConfig from "../api/axios"
 
 const Button = styled.span`
     margin-top: 30px;

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { ITweet, IReply } from "./timeline";
-import { useEffect, useMemo, useRef, useState } from "react";
-import axios, { AxiosError } from "axios";
+import { useEffect, useState } from "react";
+import { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useDispatch, useSelector } from "react-redux";
 import 'react-quill/dist/quill.snow.css'
@@ -250,7 +250,7 @@ export default function Tweet({memberName, tweet, boardId, photo, memberId, repl
         ALLOW_UNKNOWN_PROTOCOLS: true,
         ADD_TAGS: ["iframe", "img", "style"],
         ADD_ATTR: ["height", "width", "allow", "allowfullscreen", "frameborder", "scrolling", "src", "alt", "style"],
-        ALLOWED_URI_REGEXP: /^(https?:\/\/(?:www\.)?(?:youtube\.com|vimeo\.com)\/|http:\/\/(?:localhost|127\.0\.0\.1):8080\/images\/)/,
+        ALLOWED_URI_REGEXP: /^(https?:\/\/(?:www\.)?(?:youtube\.com|vimeo\.com)\/|http:\/\/(?:localhost|127\.0\.0\.1|119\.201\.41\.172):8080\/images\/)/,
     });
 
     return (<Wrapper isMyself={isMyself}>
@@ -268,7 +268,7 @@ export default function Tweet({memberName, tweet, boardId, photo, memberId, repl
             {replyList.length > 0 ? 
                 <div style={{marginTop:"5px", borderTop:"1px solid gray"}}>
                     <h4 style={{marginTop:"5px"}}>Re:</h4>
-                    {replyList.map(reply => <Reply key={reply.id} {...reply} onTweetPosted={onTweetPosted}/>)}
+                    {replyList.map(reply => <Reply key={reply.id} {...reply} onTweetPosted={onTweetPosted} boardMemberId={memberId}/>)}
                 </div>
             :null}
             {/* ========================= */}

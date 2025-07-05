@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import CsrfToken from "../api/csrfTokenGet";
 import KakaoButton from "../components/kakao-btn";
 import GoogleButton from "../components/google-btn";
@@ -147,13 +147,13 @@ export default function LoginForm() {
         dispatch({type: "SET_STRING", payload : token});
     }
 
-    const onFocus = ()=>{
+    const onClick = ()=>{
         navigate('/');
     }
 
     return (
         <Wrapper>
-            <Title onClick={onFocus}>Log into Memo</Title>
+            <Title onClick={onClick}>Log into Memo</Title>
             <Form onSubmit={onSubmit}>
                 <Input onChange={onChange} name="email" value={email} placeholder="Email" type="text" required/>
                 <Input onChange={onChange} name="password" value={password} placeholder="Password" type="password" autoComplete="off" required/>

@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function ProtectedRoute({children} : {children:React.ReactNode}) {
     const navigate = useNavigate();
-    const user = useSelector((state:any)=>state.user);
     const [isLoading, setLoading] = useState(true);
     const dispatch = useDispatch();
     const loginCheck = async ()=> {
