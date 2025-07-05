@@ -5,7 +5,7 @@ import store from "../store"
 
 
 const instance = axios.create({
-  baseURL: "http://119.201.41.172:8080",
+  baseURL: "http://119.201.41.172:8080", 
   headers: {
     
   },
