@@ -3,7 +3,7 @@ import axios, { AxiosError } from "axios";
 export default function CsrfToken() {
     const getToken = async()=>{
         try{
-            const response = await axios.get("http://119.201.41.172:8080/api/csrf-token", { withCredentials: true })
+            const response = await axios.get("http://119.201.41.172:18080/api/csrf-token", { withCredentials: true })
             if(response.status == 200) {
                 return(response.data.token);
             }

@@ -21,7 +21,7 @@ const Logo = styled.img`
 `;
 
 export default function GoogleButton() {
-    const BACKEND_ORIGIN = "http://119.201.41.172:8080";
+    const BACKEND_ORIGIN = "http://119.201.41.172:18080";
     const onClick = async () => {
         const popup = window.open(
                 "http://119.201.41.172:8080/oauth2/authorization/google", 
