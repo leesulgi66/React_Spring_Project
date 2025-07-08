@@ -106,10 +106,13 @@ export default function LoginForm() {
             formData.append("email", email);
             formData.append("password", password);
 
-            const response = await axiosConfig.post("/loginApi", formData);
+            const response = await fetchWithRetry({
+                url: "/loginApi",
+                method: 'POST',
+                data: formData,
+            }, 2, 500);
 
             if(response.status === 201) {
-                console.log("로그인 data : ",response.data); // user id
                 dispatch({type: "SET_USER", payload: response.data});
                 const csrfToken = response.headers['x-csrf-token']; // 로그인 후 재발급
                 dispatch({type: "SET_STRING", payload : csrfToken});
