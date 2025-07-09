@@ -48,9 +48,14 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
     const dispatch = useDispatch(); 
 
     const fetchTweets = async(page = 0) => {
+        if (loading) return; // 중복 요청 방지
         setLoading(true);
         try{
-            const response = await axiosConfig.get(`/api/board`);
+            const response = await axiosConfig.get(`/api/board`,{
+                    params: {
+                    page: page
+                }
+            });
             const newTweets = response.data.content;
             setTweets(prev => 
                 page === 0 
@@ -93,6 +98,7 @@ export default function Timeline({ tweetsUpdated, onTweetPosted }: { tweetsUpdat
 
     return (<Wrapper> 
         {tweets.map(tweet => <Tweet key={tweet.boardId} {...tweet} onTweetPosted={onTweetPosted} />)}
+        {loading && <p> Loading...</p>}
     </Wrapper>
     )
 }

@@ -102,6 +102,7 @@ export interface IuserInfo{
 }
 
 export default function Profile() {
+    const [loading, setLoading] = useState<boolean>(false);
     const [userInfo, setUserInfo] = useState<IuserInfo>();
     const [avatar, setAvatar] = useState<string | undefined>(undefined);
     const [inputText, setInputText] = useState(userInfo?.username || "Anonymous");
@@ -115,26 +116,30 @@ export default function Profile() {
     const dispatch = useDispatch();
 
     const fetchTweets = async(page = 0) => {
+        if (loading) return; // 중복 요청 방지
         try{
-        const response = await axiosConfig.get("/api/board/user",{
-            params: {
-                page: page
-            }
-        });
-        const newTweets = response.data.content;
-        setTweets(prev => 
-            page === 0 
-                ? newTweets // 처음 페이지
-                : [...prev, ...newTweets] // 기존 페이지 + 새 페이지
-        );
-        // 마지막 페이지인지 판단
-        setHasMore(!response.data.last);
+            setLoading(true);
+            const response = await axiosConfig.get("/api/board/user",{
+                params: {
+                    page: page
+                }
+            });
+            const newTweets = response.data.content;
+            setTweets(prev => 
+                page === 0 
+                    ? newTweets // 처음 페이지
+                    : [...prev, ...newTweets] // 기존 페이지 + 새 페이지
+            );
+            // 마지막 페이지인지 판단
+            setHasMore(!response.data.last);
         }catch(e){
             if(e instanceof AxiosError) {
                 console.log(e.message);
                 alert("로그인이 필요합니다.");
                 navigate("/login");
             }
+        }finally {
+            setLoading(false);
         }
     };
 
@@ -309,6 +314,7 @@ export default function Profile() {
             </TextOne>
             <Tweets>
                 {tweets.map(tweet => <Tweet key={tweet.boardId} {...tweet} onTweetPosted={updateAction}/>)}
+                {loading && <p> Loading...</p>}
             </Tweets>
         </Wrapper>
     )
