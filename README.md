@@ -1,6 +1,6 @@
 # React_Spring_Project 블로그 프로젝트
 ## react + spring boot 및 개인 서버 구축   
-## 사이트 주소 : https://react-spring-project.vercel.app/profile
+## 사이트 주소 : https://react-spring-project.vercel.app
 - Session Login and Oauth2 login
 - CRUD
 - Server Image upload
