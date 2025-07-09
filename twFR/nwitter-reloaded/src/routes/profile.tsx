@@ -305,7 +305,7 @@ export default function Profile() {
                 </EditButton>
             </Name>
             <TextOne>
-                My Tweets
+                My MEMO
             </TextOne>
             <Tweets>
                 {tweets.map(tweet => <Tweet key={tweet.boardId} {...tweet} onTweetPosted={updateAction}/>)}
