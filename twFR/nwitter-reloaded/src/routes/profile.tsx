@@ -88,10 +88,19 @@ const TextOne = styled.div`
 `;
 
 const DeleteId = styled.div`
-    margin-left: auto;
+    margin-left: 5px;
     margin-right: 10px;
-    border-radius: 2px;
     cursor: pointer;
+`;
+
+const Password = styled.div`
+    margin-right: 5px;
+    cursor: pointer;
+`;
+
+const ProfileButton = styled.div`
+    margin-left: auto;
+    display: flex;
 `;
 
 export interface IuserInfo{
@@ -289,7 +298,9 @@ export default function Profile() {
     }
     return (
         <Wrapper>
-            <DeleteId onClick={ondelete}>DEL ID</DeleteId>
+            <ProfileButton>
+                <Password>P/W</Password>|<DeleteId onClick={ondelete}>DEL ID</DeleteId>
+            </ProfileButton>
             <AvatarUpload htmlFor="avatar">
                 {avatar ? <AvatarImg src={avatar}/> : <svg fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />

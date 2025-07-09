@@ -148,7 +148,7 @@ export default function CreateAccount() {
     }
     return (
         <Wrapper>
-            <Title onClick={onClick}>Join X</Title>
+            <Title onClick={onClick}>Join MEMO</Title>
             <Form onSubmit={onSubmit}>
                 <Input onChange={onChange} name="username" value={username} placeholder="Name" type="text" required/>
                 <Input onChange={onChange} name="email" value={email} placeholder="Email" type="email" required/>

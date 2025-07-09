@@ -152,7 +152,7 @@ export default function LoginForm() {
 
     return (
         <Wrapper>
-            <Title onClick={onClick}>Log into Memo</Title>
+            <Title onClick={onClick}>Log into MEMO</Title>
             <Form onSubmit={onSubmit}>
                 <Input onChange={onChange} name="email" value={email} placeholder="Email" type="text" required/>
                 <Input onChange={onChange} name="password" value={password} placeholder="Password" type="password" autoComplete="off" required/>
