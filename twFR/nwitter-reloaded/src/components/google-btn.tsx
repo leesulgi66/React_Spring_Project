@@ -35,10 +35,21 @@ export default function GoogleButton() {
                 return;
             }
             if (event.data === "oauth-success") {
+                cleanup(); // 성공 시 정리 함수 호출
                 window.location.href = "/";
-                window.removeEventListener("message", receiveMessage);
-                if (popup) popup.close();
             }
+        };
+
+        const popupCheck = setInterval(() => {
+            if (popup && popup.closed) {
+                cleanup(); // 사용자가 직접 닫았을 때도 정리 함수 호출
+            }
+        }, 500);
+
+        const cleanup = () => {
+            window.removeEventListener("message", receiveMessage);
+            clearInterval(popupCheck);
+            if (popup) popup.close();
         };
 
         window.addEventListener("message", receiveMessage);
