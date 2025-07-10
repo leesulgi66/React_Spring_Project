@@ -1,2 +1,3 @@
 .gradle/
 build/
+/twBE/nweeter-backend/src/main/resources/application.properties
