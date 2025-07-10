@@ -34,11 +34,10 @@ public class MemberService {
     @Transactional
     public void save(MemberSignInRequestDto member) throws IOException {
         Optional<Member> foundName = memberRepository.findByUsername(member.getUsername());
+        Optional<Member> foundEmail = memberRepository.findByEmail(member.getEmail());
         if(foundName.isPresent()) {
             throw new IOException("사용된 이름 입니다.");
-        }
-        Optional<Member> foundEmail = memberRepository.findByEmail(member.getEmail());
-        if(foundEmail.isPresent()) {
+        }else if(foundEmail.isPresent()) {
             throw new IOException("사용된 email 입니다.");
         }
         Member saveMember = new Member();

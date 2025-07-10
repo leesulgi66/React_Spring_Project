@@ -1,5 +1,6 @@
 package com.example.nweeter_backend.handler;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,10 +16,13 @@ import java.util.UUID;
 
 @Component
 public class ImageHandler {
+    @Value("${file.upload-dir}")
+    private String uploadDirectory;
+    @Value("${file.upload-uri}")
+    private String baseUrl;
+
     public List<String> save(MultipartFile image, String key) throws IOException {
         String fileExtension = "."+Objects.requireNonNull(image.getOriginalFilename()).split("\\.")[1];
-        String baseUrl = "http://127.0.0.1:8080";
-        String uploadDirectory = "D:\\images\\";
         List<String> list = new ArrayList<>();
         UUID uuid = UUID.randomUUID();
         try{
