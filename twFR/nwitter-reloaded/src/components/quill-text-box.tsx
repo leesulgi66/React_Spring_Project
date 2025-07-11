@@ -105,9 +105,9 @@ export default function ReactQuillTextBox({ tweetValue , tweetChange, onSendData
                 if (!file) return;
 
                 // 용량 체크는 그대로 유지
-                const MAX_SIZE = 3 * 1024 * 1024; // 5MB
+                const MAX_SIZE = 10 * 1024 * 1024; // 5MB
                 if (file.size > MAX_SIZE) {
-                    alert('이미지 파일은 3MB를 초과할 수 없습니다.');
+                    alert('이미지 파일은 10MB를 초과할 수 없습니다.');
                     return;
                 }
 

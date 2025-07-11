@@ -6,6 +6,7 @@ import { AxiosError } from "axios";
 import axiosConfig from "../api/axios"
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import PasswordChangePopup from "../components/PasswordChangePopup";
 
 const Wrapper = styled.div`
     display: flex;
@@ -88,7 +89,6 @@ const TextOne = styled.div`
 `;
 
 const DeleteId = styled.div`
-    margin-left: 5px;
     margin-right: 10px;
     cursor: pointer;
 `;
@@ -108,6 +108,7 @@ export interface IuserInfo{
     username: string,
     email: string,
     profileImage: string
+    provider: string
 }
 
 export default function Profile() {
@@ -120,6 +121,8 @@ export default function Profile() {
     const [profileUpdate, setProfileUpdate] = useState(false);
     const [page, setPage] = useState<number>(0);
     const [hasMore, setHasMore] = useState<boolean>(true);
+    const [provider, setProvider] = useState(false);
+    const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
     const user = useSelector((state:any)=>state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -162,6 +165,7 @@ export default function Profile() {
                 const response:{data:IuserInfo} = await axiosConfig.get("/api/user");
                 setUserInfo(response.data);
                 setAvatar(response.data?.profileImage);
+                setProvider(response.data?.provider === null);
             }catch(e){
                 if(e instanceof AxiosError) {
                     console.log(e.message);
@@ -195,8 +199,8 @@ export default function Profile() {
         const { files } = e.target;
         if(!userInfo) return;
         if(!files || files.length === 0) return;
-        if(files[0].size > 2 * 1024 * 1024) {
-            alert("최대 2Mb의 이미지를 사용할 수 있습니다.");
+        if(files[0].size > 10 * 1024 * 1024) {
+            alert("최대 1Mb의 이미지를 사용할 수 있습니다.");
             return;
         };
         try{
@@ -296,11 +300,42 @@ export default function Profile() {
             await axiosConfig.post("/logout");
         }
     }
+    
+    const handleOpenPopup = () => {
+        setIsPopupOpen(true);
+    };
+
+    const handleClosePopup = () => {
+        setIsPopupOpen(false);
+    };
+    // 비밀번호 변경
+    const handleChangePassword = async (newPassword: string) => {
+        try {
+
+        await axiosConfig.patch("/api/user/password",{
+            password : newPassword,
+        });
+
+        alert('비밀번호가 성공적으로 변경되었습니다!');
+        handleClosePopup(); // 성공 시 팝업 닫기
+
+        } catch (error) {
+        console.error('비밀번호 변경 실패:', error);
+        // 에러를 다시 던져서 팝업 컴포넌트가 에러 메시지를 표시하게 함
+        throw error;
+        }
+    };
     return (
         <Wrapper>
             <ProfileButton>
-                <Password>P/W</Password>|<DeleteId onClick={ondelete}>DEL ID</DeleteId>
+                {provider ? <Password onClick={handleOpenPopup}>P/W |</Password> : null}<DeleteId onClick={ondelete}>DEL ID</DeleteId>
             </ProfileButton>
+            {isPopupOpen && (
+                <PasswordChangePopup
+                onClose={handleClosePopup}
+                onSubmit={handleChangePassword}
+                />
+            )}
             <AvatarUpload htmlFor="avatar">
                 {avatar ? <AvatarImg src={avatar}/> : <svg fill="none" strokeWidth={1.5} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
