@@ -10,6 +10,7 @@ import com.example.nweeter_backend.repository.BoardRepository;
 import com.example.nweeter_backend.repository.MemberRepository;
 import com.example.nweeter_backend.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class MemberService {
     }
 
     @Transactional
-    public Member oauthSave(OAuth2UserInfo oAuth2UserInfo) throws OAuth2AuthenticationException {
+    public Member oauthSave(OAuth2UserInfo oAuth2UserInfo) throws OAuth2AuthenticationException  {
         Random rand = new Random();
         int randomNumber = rand.nextInt(900) + 100;
         String provider = oAuth2UserInfo.getProvider();
@@ -109,6 +110,16 @@ public class MemberService {
                 ()-> new IllegalArgumentException("can not find user"));
         if(Objects.equals(member.getId(), principal.getMember().getId())) {
             member.setUsername(username);
+        }
+    }
+
+    @Transactional
+    public void patchPassword(String password, PrincipalDetails principal) {
+        Member member = memberRepository.findById(principal.getMember().getId()).orElseThrow(
+                ()-> new IllegalArgumentException("can not find user"));
+        if(Objects.equals(member.getId(), principal.getMember().getId())) {
+            String encPassword = passwordEncoder.encode(password);
+            member.setPassword(encPassword);
         }
     }
 

@@ -10,10 +10,12 @@ public class MemberInfoResponseDto {
         this.username = member.getUsername();
         this.email = member.getEmail();
         this.profileImage = member.getProfileImage();
+        this.provider = member.getProvider();
 
     }
     private Long id;
     private String username;
     private String email;
     private String profileImage;
+    private String provider;
 }

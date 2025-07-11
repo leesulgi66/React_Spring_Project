@@ -64,6 +64,13 @@ public class MemberApiController {
         return new ResponseEntity<>("member patch ok", HttpStatus.OK);
     }
 
+    @PatchMapping("/user/password")
+    public ResponseEntity<String> userPasswordEdit(@RequestParam(value = "password") String password, @AuthenticationPrincipal PrincipalDetails principal) {
+        log.info("user password edit call");
+        memberService.patchPassword(password, principal);
+        return new ResponseEntity<>("password edit ok", HttpStatus.OK);
+    }
+
     @DeleteMapping("/user")
     public ResponseEntity<String> userDelete(@AuthenticationPrincipal PrincipalDetails principal) {
         log.info("user delete call");
