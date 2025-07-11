@@ -12,11 +12,12 @@ const Column = styled.div`
     display: flex;
     flex-direction: row;
     .right_del{
-        margin: 2px 0 0 3px;
+        color: red;
+        margin: 2px 0 0 8px;
         cursor: pointer;
-        border-bottom: 2px solid gray;
+        border-bottom: 1px solid;
         border-radius: 10%;
-        max-height: 15px;
+        max-height: 17px;
     }
     p {
         margin: 2px 0;
@@ -58,7 +59,7 @@ export default function Reply({ id, memberId, boardMemberId, memberName, content
         <Wrapper>
             <Column>
                 └{writer ? <p>🏠</p>:null}<Username isMyself={isMyself}>{memberName}</Username><p id="comma">:</p><p>{myContent}</p>
-                {isMyself ? <p onClick={onDelete} className="right_del">✖</p> : null}
+                {isMyself ? <p onClick={onDelete} className="right_del"> X </p> : null}
             </Column>
         </Wrapper>
     )
