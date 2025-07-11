@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -65,8 +66,10 @@ public class MemberApiController {
     }
 
     @PatchMapping("/user/password")
-    public ResponseEntity<String> userPasswordEdit(@RequestParam(value = "password") String password, @AuthenticationPrincipal PrincipalDetails principal) {
+    public ResponseEntity<String> userPasswordEdit(@RequestBody Map<String, Object> payload, @AuthenticationPrincipal PrincipalDetails principal) {
         log.info("user password edit call");
+        String password = (String)payload.get("password");
+        System.out.println(password);
         memberService.patchPassword(password, principal);
         return new ResponseEntity<>("password edit ok", HttpStatus.OK);
     }
