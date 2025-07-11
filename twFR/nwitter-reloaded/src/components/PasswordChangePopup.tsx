@@ -120,7 +120,6 @@ const PasswordChangePopup: React.FC<IPasswordChangePopupProps> = ({ onClose, onS
       return;
     }
     
-    // (선택) 비밀번호 정책 추가 (예: 8자 이상)
     if (password.length < 6) {
       setError('비밀번호는 6자 이상이어야 합니다.');
       return;

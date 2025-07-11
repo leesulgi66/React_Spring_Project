@@ -194,7 +194,7 @@ export default function Profile() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, [hasMore]);
-
+    // 아바타 변경
     const onAvatarCahange = async (e:React.ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;
         if(!userInfo) return;
@@ -240,7 +240,7 @@ export default function Profile() {
         editDone()
         }
     };
-
+    // 닉네임 변경
     const editDone = async ()=> {
         const ok = confirm("이름을 변경하시겠습니까?");
         if(!ok || !userInfo) return;
@@ -311,17 +311,15 @@ export default function Profile() {
     // 비밀번호 변경
     const handleChangePassword = async (newPassword: string) => {
         try {
+            await axiosConfig.patch("/api/user/password",{
+                password : newPassword,
+            });
 
-        await axiosConfig.patch("/api/user/password",{
-            password : newPassword,
-        });
-
-        alert('비밀번호가 성공적으로 변경되었습니다!');
-        handleClosePopup(); // 성공 시 팝업 닫기
+            alert('비밀번호가 성공적으로 변경되었습니다!');
+            handleClosePopup(); // 성공 시 팝업 닫기
 
         } catch (error) {
-        console.error('비밀번호 변경 실패:', error);
-        // 에러를 다시 던져서 팝업 컴포넌트가 에러 메시지를 표시하게 함
+                console.error('비밀번호 변경 실패:', error);
         throw error;
         }
     };
