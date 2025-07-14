@@ -33,7 +33,7 @@ public class Member {
     private String profileImage;
 
     @Column
-    private String profileImageKey;
+    private String profileImagePath;
 
     @Column
     private String provider;

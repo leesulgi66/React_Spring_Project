@@ -25,6 +25,12 @@ public class ImageInBoard {
     private String imageLocation;
 
     @Column
+    private String compressedImageUrl;
+
+    @Column
+    private String compressedFilePath;
+
+    @Column
     private Long boardId;
 
     @Column

@@ -89,6 +89,9 @@ public class BoardService {
             List<ImageInBoard> list = imageInBoardRepository.findAllByBoardId(id);
             if(!list.isEmpty()){
                 for(ImageInBoard image : list) {
+                    if(image.getCompressedFilePath() != null) {
+                        imageHandler.deleteFile(image.getCompressedFilePath());
+                    }
                     imageHandler.deleteFile(image.getImageLocation());
                     imageInBoardRepository.delete(image);
                 }
@@ -119,15 +122,28 @@ public class BoardService {
     @Transactional
     public BoardImageResponseDto boardImageSave(MultipartFile file) throws IOException {
         BoardImageResponseDto dto = new BoardImageResponseDto();
+        ImageSaveResultDto saveResult = null;
         ImageInBoard IIB = new ImageInBoard();
-        List<String> list = imageHandler.save(file, "boardImg");
-        IIB.setImageUrl(list.get(0));
-        IIB.setImageLocation(list.get(1));
+        saveResult = imageHandler.save(file, "boardImg_");
+
+        if (saveResult != null) {
+            IIB.setImageUrl(saveResult.getOriginalImageUrl());
+            IIB.setImageLocation(saveResult.getOriginalFilePath());
+            dto.setImageUrl(IIB.getImageUrl());
+            dto.setImageLocation(IIB.getImageLocation());
+            // 압축 이미지가 있을 경우에만 저장
+            if (saveResult.getCompressedImageUrl() != null) {
+                IIB.setCompressedImageUrl(saveResult.getCompressedImageUrl());
+                IIB.setCompressedFilePath(saveResult.getCompressedFilePath());
+                dto.setImageUrl(IIB.getCompressedImageUrl());
+                dto.setImageLocation(IIB.getCompressedFilePath());
+            }
+        }
+
         IIB.setState(ImageInBoard.State.PENDING);
         IIB = imageInBoardRepository.save(IIB);
 
-        dto.setImageUrl(IIB.getImageUrl());
-        dto.setImageLocation(IIB.getImageLocation());
+
         dto.setImageId(IIB.getId());
 
         return dto;
@@ -137,6 +153,9 @@ public class BoardService {
         List<ImageInBoard> list = imageInBoardRepository.findAllByState(ImageInBoard.State.PENDING);
         for(ImageInBoard image : list) {
             String delLocation = image.getImageLocation();
+            if(image.getCompressedFilePath() != null) {
+                imageHandler.deleteFile(image.getCompressedFilePath());
+            }
             imageHandler.deleteFile(delLocation);
             imageInBoardRepository.delete(image);
         }

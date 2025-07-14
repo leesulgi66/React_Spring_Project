@@ -2,6 +2,7 @@ package com.example.nweeter_backend.service;
 
 import com.example.nweeter_backend.auth.PrincipalDetails;
 import com.example.nweeter_backend.auth.provider.OAuth2UserInfo;
+import com.example.nweeter_backend.dto.ImageSaveResultDto;
 import com.example.nweeter_backend.dto.MemberInfoResponseDto;
 import com.example.nweeter_backend.dto.MemberSignInRequestDto;
 import com.example.nweeter_backend.handler.ImageHandler;
@@ -94,13 +95,13 @@ public class MemberService {
     public void patchMember(MultipartFile file, PrincipalDetails principal) throws IOException {
         Member member = memberRepository.findById(principal.getMember().getId()).orElseThrow(
                 ()-> new IllegalArgumentException("can not find user"));
-        if(member.getProfileImageKey() != null){
-            imageHandler.deleteFile(member.getProfileImageKey());
+        if(member.getProfileImagePath() != null){
+            imageHandler.deleteFile(member.getProfileImagePath());
         }
-        List<String> imgList = imageHandler.save(file, "userImg-"+principal.getMember().getId());
+        ImageSaveResultDto imgDto = imageHandler.save(file, "userImg-"+principal.getMember().getId());
         if(member.getId().equals(principal.getMember().getId())){
-            member.setProfileImage(imgList.get(0));
-            member.setProfileImageKey(imgList.get(1));
+            member.setProfileImage(imgDto.getOriginalImageUrl());
+            member.setProfileImagePath(imgDto.getOriginalFilePath());
         }
     }
 
@@ -130,8 +131,8 @@ public class MemberService {
         replyRepository.deleteByMember(member);
         int boards = boardRepository.delBoards(member.getId());
         System.out.println("delete boards count : " + boards);
-        if(!member.getProfileImageKey().isEmpty()){
-            imageHandler.deleteFile(member.getProfileImageKey());
+        if(!member.getProfileImagePath().isEmpty()){
+            imageHandler.deleteFile(member.getProfileImagePath());
         }
         memberRepository.deleteById(member.getId());
     }
