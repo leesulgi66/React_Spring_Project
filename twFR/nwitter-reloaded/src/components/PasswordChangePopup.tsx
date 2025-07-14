@@ -106,7 +106,7 @@ const PasswordChangePopup: React.FC<IPasswordChangePopupProps> = ({ onClose, onS
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setError(null); 
 
     // 1. 유효성 검사: 빈 값 확인
     if (!password || !confirmPassword) {
