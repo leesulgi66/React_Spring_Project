@@ -144,7 +144,7 @@ export default function Tweet({memberName, tweet, boardId, photo, memberId, repl
     const isMyself = user === memberId
 
     const onDelete = async() => {
-        const ok = confirm("Are you sure you want to delete this tweet?");
+        const ok = confirm("메모를 삭제하시겠습니까?");
         if(!ok || false) return;
         try {
             const response = await axiosConfig.delete(`/api/board/${boardId}`);

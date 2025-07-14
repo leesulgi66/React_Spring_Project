@@ -91,7 +91,6 @@ export default function ReactQuillTextBox({ tweetValue , tweetChange, onSendData
         };
 
         const imageHandler = () => {
-            if(!user) return;
             if (!quillRef.current) return;
 
             const input = document.createElement('input');

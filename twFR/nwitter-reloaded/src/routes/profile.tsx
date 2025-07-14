@@ -199,8 +199,8 @@ export default function Profile() {
         const { files } = e.target;
         if(!userInfo) return;
         if(!files || files.length === 0) return;
-        if(files[0].size > 10 * 1024 * 1024) {
-            alert("최대 1Mb의 이미지를 사용할 수 있습니다.");
+        if(files[0].size > 2 * 1024 * 1024) {
+            alert("최대 2Mb의 이미지를 사용할 수 있습니다.");
             return;
         };
         try{
